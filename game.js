@@ -1,6 +1,6 @@
 //set up gameport, renderer, and stage
 var gameport = document.getElementById("gameport");
-var renderer = PIXI.autoDetectRenderer(400, 400, {backgroundColor: 0xe6b5eb});
+var renderer = PIXI.autoDetectRenderer(800, 500, {backgroundColor: 0x000000});
 gameport.appendChild(renderer.view);
 var stage = new PIXI.Container();
 
@@ -25,5 +25,5 @@ animate();
 
 function reset()
 {
-  
+
 }
