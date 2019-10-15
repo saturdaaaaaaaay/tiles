@@ -3,11 +3,13 @@ var gameport = document.getElementById("gameport");
 //var renderer = PIXI.autoDetectRenderer(200, 500, {backgroundColor: 0x000000});
 var app = new PIXI.Application({width: 800, height: 500});
 gameport.appendChild(app.view);
-//var stage = new PIXI.Container();
+var stage = new PIXI.Container();
+
+var newGame = new GameController(stage, 800, 500);
 
 //scene graphs
 var titleScene;
-var gameScene;
+//var gameScene;
 var creditScene;
 
 //title text (this stuff's temporary)
@@ -25,8 +27,8 @@ function setup()
   titleScene = new PIXI.Container();
   gameScene = new PIXI.Container();
 
-  app.stage.addChild(titleScene);
-  app.stage.addChild(gameScene);
+  stage.addChild(titleScene);
+  //stage.addChild(gameScene);
 
   gameScene.visible = false;
 
@@ -68,13 +70,14 @@ function titleSetup()
 
 function gameSetup()
 {
-  var tempText =  new PIXI.Text("Game: coming soon :)", {fill : 0xff1010});
+  //var tempText =  new PIXI.Text("Game: coming soon :)", {fill : 0xff1010});
 
-  gameScene.addChild(tempText);
+  //gameScene.addChild(tempText);
 }
 
 function dispGame()
 {
-  gameScene.visible = true;
+  //gameScene.visible = true;
   titleScene.visible = false;
+  newGame.runGame();
 }
