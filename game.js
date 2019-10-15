@@ -1,7 +1,8 @@
 //set up gameport, renderer, and stage
 var gameport = document.getElementById("gameport");
-var renderer = PIXI.autoDetectRenderer(800, 500, {backgroundColor: 0x000000});
-gameport.appendChild(renderer.view);
+//var renderer = PIXI.autoDetectRenderer(200, 500, {backgroundColor: 0x000000});
+var app = new PIXI.Application({width: 800, height: 500});
+gameport.appendChild(app.view);
 var stage = new PIXI.Container();
 
 //scene graphs
