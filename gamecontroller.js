@@ -51,12 +51,13 @@ class GameController {
         this.assetLoader.add("ghost.png");
     }
 
-    mouseupEventHandler(event) {
-        if (event.offsetX < this.ghost.position.x) {
-            console.log("move left");
-        }
-        else if (event.offsetX > this.ghost.position.x) {
-            console.log("move right");
+    mouseupEventHandler(ghost) {
+        return function(event) {
+            if (event.offsetX < ghost.position.x) {
+                console.log("move left");
+            } else if (event.offsetX > ghost.position.x) {
+                console.log("move right");
+            }
         }
     }
 
@@ -68,8 +69,9 @@ class GameController {
         this.loadAssets();
         this.setupBackdrop();
         this.setupGhost();
-        
-        document.addEventListener("mouseup", this.mouseupEventHandler);
+
+        var functionOnClick = this.mouseupEventHandler(this.ghost);
+        document.addEventListener("mouseup", functionOnClick);
     }
     
     setupBackdrop() {
