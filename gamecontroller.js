@@ -14,6 +14,10 @@ let Texture = PIXI.Texture;
 let Text = PIXI.Text;
 let TextStyle = PIXI.TextStyle;
 
+// Constants
+const GHOST_X = 100;
+const GHOST_Y = 300;
+const TWEEN_SPEED = 100;
 
 class GameController {
     
@@ -32,33 +36,50 @@ class GameController {
         
         this.gameActive = true;
         
-        this.container = new Container();
+        this.ghost = new Sprite();
         
         this.assetLoader = new Loader();
     }
-    
-    setup() {
-        this.loadAssets();
-        this.setupBackdrop();
+
+    isActive() {
+        return this.gameActive;
     }
-    
+
     loadAssets() {
         this.assetLoader.add("backdrop.png");
         this.assetLoader.add("ui_bg.png");
         this.assetLoader.add("ghost.png");
     }
-    
-    setupBackdrop() {
-        let backdrop = new Sprite(Texture.from("backdrop.png"));
-        this.container.addChild(backdrop);
-        this.stage.addChild(this.container);
+
+    mouseupEventHandler(event) {
+        if (event.offsetX < this.ghost.position.x) {
+            console.log("move left");
+        }
+        else if (event.offsetX > this.ghost.position.x) {
+            console.log("move right");
+        }
     }
-    
+
     runGame() {
         this.setup();
     }
     
-    isActive() {
-        return this.gameActive;
+    setup() {
+        this.loadAssets();
+        this.setupBackdrop();
+        this.setupGhost();
+        
+        document.addEventListener("mouseup", this.mouseupEventHandler);
+    }
+    
+    setupBackdrop() {
+        let backdrop = new Sprite(Texture.from("backdrop.png"));
+        this.stage.addChild(backdrop);
+    }
+    
+    setupGhost() {
+        this.ghost.texture = Texture.from("ghost.png");
+        this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
+        this.stage.addChild(this.ghost);
     }
 }
