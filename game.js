@@ -3,7 +3,7 @@ var gameport = document.getElementById("gameport");
 //var renderer = PIXI.autoDetectRenderer(200, 500, {backgroundColor: 0x000000});
 var app = new PIXI.Application({width: 800, height: 500});
 gameport.appendChild(app.view);
-var stage = new PIXI.Container();
+//var stage = new PIXI.Container();
 
 //scene graphs
 var titleScene;
@@ -25,8 +25,8 @@ function setup()
   titleScene = new PIXI.Container();
   gameScene = new PIXI.Container();
 
-  stage.addChild(titleScene);
-  stage.addChild(gameScene);
+  app.stage.addChild(titleScene);
+  app.stage.addChild(gameScene);
 
   gameScene.visible = false;
 
