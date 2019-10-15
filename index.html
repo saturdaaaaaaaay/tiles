@@ -1,35 +1,34 @@
-<html>
- <head>
-   <title>Untitled Trick or Treat Game</title>
-   <!--<link rel="icon" href="bill_cipher.png" sizes="16x16" type="image/png">-->
- </head>
- <body>
-   <h1>Untitled Trick or Treat Game</h1>
-   <div id="gameport" tabindex="0"></div>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Project 3</title>
+    </head>
 
-   <h1>How to play:</h1>
-   <p>Insert instructions here</p>
+    <body>
+        <h1>Trick-or-Treat</h1>
+        <div id="gameport"></div>
 
-   <div id="disqus_thread"></div>
+        <h1>Instructions</h1>
+        <p>
+        </p>
 
-   <script>
-
-   (function()
-   {
-
-     var d = document, s = d.createElement('script');
-
-     s.src = 'https://nau-cs413.disqus.com/embed.js';
-
-     s.setAttribute('data-timestamp', +new Date());
-
-     (d.head || d.body).appendChild(s);
-
-    })();
-
-   </script>
-
-   <script src="pixi.js"></script>
-   <script src="game.js"></script>
- </body>
+        <h1>Comments</h1>
+        <div id="disqus_thread"></div>
+<!--
+        <script>
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'http://nau-cs413.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+-->
+        <script src="pixi.min.js" charset="utf-8"></script>
+        <script src="pixi-sound.js" charset="utf-8"></script>
+        <script src="tweenjs.min.js" charset="utf-8"></script>
+        <script src="gamecontroller.js"></script>
+        <script src="main.js"></script>
+    </body>
 </html>
