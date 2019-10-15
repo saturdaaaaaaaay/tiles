@@ -54,7 +54,7 @@ class GameController {
         this.stage.addChild(this.container);
     }
     
-    newGame() {
+    runGame() {
         this.setup();
     }
     

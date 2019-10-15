@@ -11,7 +11,7 @@ stage = new PIXI.Container();
 // ###################### START A NEW GAME ###############################
 
 let newgame = new GameController(stage, 800, 500);
-newgame.newGame();
+newgame.runGame();
 
 // #######################################################################
 
