@@ -9,7 +9,7 @@ var titleScene;
 var gameScene;
 //var creditScene;
 var menuScene;
-var gameOverScene();
+var gameOverScene;
 
 var newgame;
 
@@ -41,6 +41,7 @@ function setup()
   app.stage.addChild(titleScene);
   app.stage.addChild(gameScene);
   app.stage.addChild(menuScene); //this line breaks the ghost
+  app.stage.addChild(gameOverScene);
 
   gameScene.visible = false;
   menuScene.visible = false;
