@@ -3,23 +3,20 @@ var gameport = document.getElementById("gameport");
 //var renderer = PIXI.autoDetectRenderer(200, 500, {backgroundColor: 0x000000});
 var app = new PIXI.Application({width: 800, height: 500});
 gameport.appendChild(app.view);
-var stage = new PIXI.Container();
+//var stage = new PIXI.Container();
 
-var newGame = new GameController(stage, 800, 500);
+var newgame = new GameController(app.stage, 800, 500);
 
 //scene graphs
 var titleScene;
-//var gameScene;
+var gameScene;
 var creditScene;
 
 //title text (this stuff's temporary)
 var titleText;
 var startText;
 
-//load spritesheet
-PIXI.loader
-  .add("assets.json")
-  .load(setup);
+PIXI.Loader.shared.add("assets.json").load(setup);
 
 //set up game
 function setup()
@@ -27,26 +24,13 @@ function setup()
   titleScene = new PIXI.Container();
   gameScene = new PIXI.Container();
 
-  stage.addChild(titleScene);
-  //stage.addChild(gameScene);
+  app.stage.addChild(titleScene);
+  app.stage.addChild(gameScene);
 
   gameScene.visible = false;
 
   titleSetup();
   gameSetup();
-}
-
-function animate()
-{
-  requestAnimationFrame(animate);
-  renderer.render(stage);
-}
-animate();
-
-
-function reset()
-{
-
 }
 
 function titleSetup()
@@ -79,5 +63,11 @@ function dispGame()
 {
   //gameScene.visible = true;
   titleScene.visible = false;
-  newGame.runGame();
+  newgame.runGame();
 }
+
+function animate()
+{
+  requestAnimationFrame(animate);
+}
+animate();
