@@ -9,6 +9,7 @@ var titleScene;
 var gameScene;
 //var creditScene;
 var menuScene;
+var gameOverScene();
 
 var newgame;
 
@@ -23,6 +24,8 @@ var menuText;
 var titleReturnText;
 var exitText;
 
+var gameOverText;
+
 PIXI.Loader.shared.add("assets.json").load(setup);
 
 //set up game
@@ -31,6 +34,7 @@ function setup()
   titleScene = new PIXI.Container();
   gameScene = new PIXI.Container();
   menuScene = new PIXI.Container();
+  gameOverScene = new PIXI.Container();
 
   newgame = new GameController(gameScene, 800, 500);
 
@@ -40,10 +44,12 @@ function setup()
 
   gameScene.visible = false;
   menuScene.visible = false;
+  gameOverScene.visible = false;
 
   titleSetup();
   gameSetup();
   menuSetup();
+  gameOverSetup();
 }
 
 function titleSetup()
@@ -98,6 +104,13 @@ function menuSetup()
   exitText.on('mousedown', dispGame);
 }
 
+function gameOverSetup()
+{
+  gameOverText = new PIXI.Text("Game Over", {fill : 0xff1010});
+
+  gameOverScene.addChild(gameOverText);
+}
+
 function dispTitle()
 {
   titleScene.visible = true;
@@ -124,8 +137,19 @@ function dispMenu()
   menuScene.visible = true;
 }
 
+function dispGameOver()
+{
+  gameScene.visible = false;
+  gameOverScene.visible = true;
+}
+
 function animate()
 {
   requestAnimationFrame(animate);
+
+  if (!(newgame.isActive()))
+  {
+    dispGameOver();
+  }
 }
 animate();
