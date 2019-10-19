@@ -15,9 +15,11 @@ let Text = PIXI.Text;
 let TextStyle = PIXI.TextStyle;
 
 // Constants
-const GHOST_X = 150;
+const BOUND_LEFT = 150;
+const BOUND_RIGHT = 500;
+const GHOST_X = 350;
 const GHOST_Y = 350;
-const TWEEN_SPEED = 100;
+const TWEEN_SPEED = 1000;
 
 class GameController {
     
@@ -42,6 +44,14 @@ class GameController {
         this.assetLoader = new Loader();
     }
 
+    checkGameEnd(THIS) {
+        return function () {
+            if (THIS.ghost.position.x >= BOUND_RIGHT) {
+                THIS.gameActive = false;
+            }
+        }
+    }
+
     isActive() {
         return this.gameActive;
     }
@@ -54,25 +64,25 @@ class GameController {
     }
 
     mouseupEventHandler(THIS) {
-        return function(event) {
-            if (event.offsetX > 0 && event.offsetX < 100 && event.offsetY > 0 && event.offsetY < 100) {
-                this.gameActive = false;
-                console.log("gameActive: " + this.gameActive);
+        return function (event) {
+            let move_x = event.offsetX;
+            if (move_x < BOUND_LEFT) {
+                move_x = BOUND_LEFT;
             }
-            else if (event.offsetX < THIS.ghost.position.x) {
-                THIS.moveLeft();
-            } else if (event.offsetX > THIS.ghost.position.x) {
-                THIS.moveRight();
+            if (move_x > BOUND_RIGHT) {
+                move_x = BOUND_RIGHT;
             }
+            THIS.moveGhost(move_x);
         }
     }
     
-    moveLeft() {
-        console.log("move left");
+    moveGhost(NEW_X) {
+        var functionCheckGameEnd = this.checkGameEnd(this);
+        createjs.Tween.get(this.ghost.position).to({ x: NEW_X }, TWEEN_SPEED).call(functionCheckGameEnd);
     }
-    
-    moveRight() {
-        console.log("move right");
+
+    resetGame() {
+        this.ghost.position = ({ x: GHOST_X, y: GHOST_Y });
     }
 
     runGame() {
@@ -82,7 +92,7 @@ class GameController {
     setup() {
         this.loadAssets();
         this.setupBackdrop();
-        this.setupEndGameButton();
+        this.setupEndGame();
         this.setupGhost();
 
         var functionOnClick = this.mouseupEventHandler(this);
@@ -93,10 +103,12 @@ class GameController {
         let backdrop = new Sprite(Texture.from("backdrop.png"));
         this.stage.addChild(backdrop);
     }
-    
-    setupEndGameButton() {
+
+    // For testing purposes only
+    setupEndGame() {
         this.endGameButton.texture = Texture.from("endgame.png");
-        this.endGameButton.position = ({x: 0, y: 0});
+        this.endGameButton.position = ({ x: BOUND_RIGHT, y: GHOST_Y });
+        this.endGameButton.anchor = ({ x: this.endGameButton.width / 2, y: this.endGameButton.height / 2 });
         this.stage.addChild(this.endGameButton);
     }
     
