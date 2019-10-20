@@ -22,32 +22,59 @@ const GHOST_X = 400;
 const GHOST_Y = 350;
 const TWEEN_SPEED = 1000;
 
+// ####################################### CLASSES ############################
+
 class House {
+    /*
+     * Represents a house in-game
+     * 
+     * takes PIXI.Container: STAGE
+     */
     constructor(STAGE) {
         this.stage = STAGE;
+        
+        // Signals if the house is active or not
+        this.lightOn = true;
         
         this.assetloader = new Loader();
         this.assetloader.add("house.png");
         
-        this.house = new Sprite(Texture.from("house.png"));
+        // "house" is actually a container holding building and light
+        this.house = new Container();
+        this.building = new Sprite(Texture.from("house.png"));
+        this.light = new Sprite(Texture.from("light.png"));
     }
     
+    // A house is a container with a building and a light.
     addHouse(X) {
+        this.house.addChild(this.building);
+        this.house.addChild(this.light);
         this.house.position = ({x: X, y: 100});
         this.stage.addChild(this.house);
     }
     
+    // Turn the light off to signal house is inactive
+    deactivateHouse() {
+        this.lightOn = false;
+        this.light.visible = false;
+    }
+    
+    // Check if both the x,y (from mouse click) and object have overlap with
+    // this house
     hitTest(X, Y, OBJECT) {
-        if (OBJECT.position.x > this.house.position.x && OBJECT.position.x < this.house.position.x + 250) {
-            if (X > this.house.position.x && X < this.house.position.x + 300) {
-                if (Y > this.house.position.y && Y < this.house.position.y + 300) {
-                    return true;
+        if (this.lightOn) {
+            if (OBJECT.position.x > this.house.position.x && OBJECT.position.x < this.house.position.x + 250) {
+                if (X > this.house.position.x && X < this.house.position.x + 300) {
+                    if (Y > this.house.position.y && Y < this.house.position.y + 300) {
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
     
+    // Moves the house as the player "moves" (scrolling bg style)
     moveHouse(OFFSET) {
         createjs.Tween.get(this.house.position).to({x: this.house.position.x - OFFSET}, TWEEN_SPEED);
     }
@@ -68,25 +95,51 @@ class GameController {
         this.width = WIDTH;
         this.height = HEIGHT;
         
-        this.distance = -250;
+        // Keep track of distance from origin
+        this.distance = BOUND_LEFT;
+        
         this.gameActive = true;
         
-        this.background = new Container();
-        this.houses = new Container();
-        this.foreground = new Container();
+        // Houses completed vs goal
+        this.completed = 0;
+        this.goal = 5;
+
+        // Scene Graph
+        /*
+         * Stage <- Backdrop (non scrolling)
+         * Stage <- Background <- Scrolling Background
+         * Stage <- Houses <- House (multiple, scrolling)
+         * Stage <- Foreground <- Ghost, UI
+         */
+        this.stage.addChild(new Sprite(Texture.from("backdrop.png")));
         
+        this.background = new Container();
+        this.stage.addChild(this.background);
+        
+        this.houses = new Container();
+        this.stage.addChild(this.houses);
+        
+        this.foreground = new Container();
+        this.stage.addChild(this.foreground);
+        
+        // Player character
         this.ghost = new Sprite();
         
+        // Array of houses
         this.houseArray = [];
 
         this.scrollingBG = new TilingSprite(Texture.from("tree_bg.png"), this.width, this.height);
 
+        // Class property to represent the function so that it can be removed
         this.functionOnClick;
-        //this.functionCheckGameEnd;
         
         this.assetLoader = new Loader();
+
+        // Setup the stage with the assets
+        this.setup();
     }
     
+    // Adds houses to the stage; NUMBER = number of houses to add
     addHouses(NUMBER) {
         let counter = 0;
         while (counter < NUMBER) {
@@ -94,38 +147,44 @@ class GameController {
             this.houseArray[counter].addHouse(600 * (counter + 1));
             counter++;
         }
-        this.stage.addChild(this.houses);
     }
 
+    // Used to check if the game has ended
     checkGameEnd(THIS) {
-        return function () {
-            if (THIS.ghost.position.x >= BOUND_RIGHT) {
-                THIS.gameActive = false;
-            }
-        }
+        THIS.gameActive = !(THIS.completed === THIS.goal);
     }
 
+    // Method to return if game is active
     isActive() {
         return this.gameActive;
     }
 
+    // Load assets needed
     loadAssets() {
         this.assetLoader.add("backdrop.png");
         this.assetLoader.add("ui_bg.png");
         this.assetLoader.add("ghost.png");
     }
 
+    // Handles all the mouse clicking in-game
     mouseupEventHandler(THIS) {
         return function (event) {
             let check = false;
             let i = 0;
+            
+            // Check to see if a house is activated
             while (!check && i < THIS.houseArray.length) {
                 check = THIS.houseArray[i].hitTest(event.offsetX, event.offsetY, THIS.ghost);
                 i++;
             }
             if (check) {
                 console.log("load match game");
+                THIS.houseArray[i - 1].deactivateHouse();
+                THIS.completed++;
+                THIS.checkGameEnd(THIS);
             }
+            
+            // No house activated, so move player
             else if (event.offsetY > 300 && event.offsetY < 400 && THIS.distance >= BOUND_LEFT && THIS.distance <= BOUND_RIGHT) {
                 let move_x = event.offsetX - THIS.width / 2;
                 if (THIS.distance + move_x < BOUND_LEFT) {
@@ -140,6 +199,7 @@ class GameController {
         }
     }
     
+    // Handles "movement" of the player (moves background and houses)
     moveGhost(OFFSET) {
         this.distance += OFFSET;
         //this.functionCheckGameEnd = this.checkGameEnd(this);
@@ -150,44 +210,49 @@ class GameController {
         }
     }
 
+    // Resets game back to starting state
     resetGame() {
         this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
+        this.distance = BOUND_LEFT;
+        this.completed = 0;
+        this.gameActive = true;
+
+        // Reset the houses
+        this.houses.removeChildren();
+        this.houseArray = [];
+        this.addHouses(this.goal);
     }
 
+    // Start a new game
     runGame() {
-        this.setup();
+        this.resetGame();
         this.setMouseListener();
     }
     
+    // Add a mouse listener to the game
     setMouseListener() {
         this.functionOnClick = this.mouseupEventHandler(this);
         let target = document.getElementById("gameport");
-        target.addEventListener("mousedown", this.functionOnClick);
+        target.addEventListener("mouseup", this.functionOnClick);
     }
     
+    // Various tasks for setting up the game
     setup() {
         this.loadAssets();
-        this.setupBackdrop();
         this.setupScrollingBG();
-        this.addHouses(5);
         this.setupGhost();
     }
     
-    setupBackdrop() {
-        let backdrop = new Sprite(Texture.from("backdrop.png"));
-        this.stage.addChild(backdrop);
-    }
-    
+    // Add the player character (a ghost)
     setupGhost() {
         this.ghost.texture = Texture.from("ghost.png");
         this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
         this.ghost.anchor = ({x: this.ghost.width / 2, y: this.ghost.height / 2});
         this.foreground.addChild(this.ghost);
-        this.stage.addChild(this.foreground);
     }
     
+    // Add a scrolling background
     setupScrollingBG() {
-        this.stage.addChild(this.background);
         this.background.addChild(this.scrollingBG);
     }
 }
