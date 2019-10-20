@@ -13,13 +13,34 @@ let sound = PIXI.sound;
 let Texture = PIXI.Texture;
 let Text = PIXI.Text;
 let TextStyle = PIXI.TextStyle;
+let TilingSprite = PIXI.TilingSprite;
 
 // Constants
 const BOUND_LEFT = 150;
 const BOUND_RIGHT = 500;
-const GHOST_X = 350;
+const GHOST_X = 400;
 const GHOST_Y = 350;
 const TWEEN_SPEED = 1000;
+
+class House {
+    constructor(STAGE) {
+        this.stage = STAGE;
+        
+        this.assetloader = new Loader();
+        this.assetloader.add("house.png");
+        
+        this.house = new Sprite(Texture.from("house.png"));
+    }
+    
+    addHouse(X) {
+        this.house.position = ({x: X, y: 100});
+        this.stage.addChild(this.house);
+    }
+    
+    moveHouse(OFFSET) {
+        createjs.Tween.get(this.house.position).to({x: this.house.position.x - OFFSET}, TWEEN_SPEED);
+    }
+}
 
 class GameController {
     
@@ -38,10 +59,26 @@ class GameController {
         
         this.gameActive = true;
         
+        this.background = new Container();
+        this.houses = new Container();
+        this.foreground = new Container();
+        
         this.endGameButton = new Sprite();
         this.ghost = new Sprite();
+        this.house;
+
+        this.scrollingBG = new TilingSprite(Texture.from("tree_bg.png"), this.width, this.height);
+
+        this.functionOnClick;
+        //this.functionCheckGameEnd;
         
         this.assetLoader = new Loader();
+    }
+    
+    addHouses() {
+        this.house = new House(this.houses);
+        this.house.addHouse(500);
+        this.stage.addChild(this.houses);
     }
 
     checkGameEnd(THIS) {
@@ -60,62 +97,58 @@ class GameController {
         this.assetLoader.add("backdrop.png");
         this.assetLoader.add("ui_bg.png");
         this.assetLoader.add("ghost.png");
-        this.assetLoader.add("endgame.png");
     }
 
     mouseupEventHandler(THIS) {
         return function (event) {
-            let move_x = event.offsetX;
-            if (move_x < BOUND_LEFT) {
-                move_x = BOUND_LEFT;
-            }
-            if (move_x > BOUND_RIGHT) {
-                move_x = BOUND_RIGHT;
-            }
+            let move_x = event.offsetX - THIS.width / 2;
             THIS.moveGhost(move_x);
         }
     }
     
-    moveGhost(NEW_X) {
-        var functionCheckGameEnd = this.checkGameEnd(this);
-        createjs.Tween.get(this.ghost.position).to({ x: NEW_X }, TWEEN_SPEED).call(functionCheckGameEnd);
+    moveGhost(OFFSET) {
+        //this.functionCheckGameEnd = this.checkGameEnd(this);
+        createjs.Tween.get(this.scrollingBG.tilePosition).to({x: this.scrollingBG.tilePosition.x - OFFSET / 2}, TWEEN_SPEED);
+        this.house.moveHouse(OFFSET);
     }
 
     resetGame() {
-        this.ghost.position = ({ x: GHOST_X, y: GHOST_Y });
+        this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
     }
 
     runGame() {
         this.setup();
+        this.setMouseListener();
+    }
+    
+    setMouseListener() {
+        this.functionOnClick = this.mouseupEventHandler(this);
+        document.addEventListener("mousedown", this.functionOnClick);
     }
     
     setup() {
         this.loadAssets();
         this.setupBackdrop();
-        this.setupEndGame();
+        this.setupScrollingBG();
+        this.addHouses();
         this.setupGhost();
-
-        var functionOnClick = this.mouseupEventHandler(this);
-        document.addEventListener("mouseup", functionOnClick);
     }
     
     setupBackdrop() {
         let backdrop = new Sprite(Texture.from("backdrop.png"));
         this.stage.addChild(backdrop);
     }
-
-    // For testing purposes only
-    setupEndGame() {
-        this.endGameButton.texture = Texture.from("endgame.png");
-        this.endGameButton.position = ({ x: BOUND_RIGHT, y: GHOST_Y });
-        this.endGameButton.anchor = ({ x: this.endGameButton.width / 2, y: this.endGameButton.height / 2 });
-        this.stage.addChild(this.endGameButton);
-    }
     
     setupGhost() {
         this.ghost.texture = Texture.from("ghost.png");
         this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
-        this.ghost.anchor = ({x: this.ghost.width / 2, y: this.ghost.height / 2})
-        this.stage.addChild(this.ghost);
+        this.ghost.anchor = ({x: this.ghost.width / 2, y: this.ghost.height / 2});
+        this.foreground.addChild(this.ghost);
+        this.stage.addChild(this.foreground);
+    }
+    
+    setupScrollingBG() {
+        this.stage.addChild(this.background);
+        this.background.addChild(this.scrollingBG);
     }
 }
