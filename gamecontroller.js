@@ -1,7 +1,7 @@
 // gamecontroller.js
 
 /*
- * 
+ *
  */
 
 // Alias Declarations
@@ -22,11 +22,11 @@ const GHOST_Y = 350;
 const TWEEN_SPEED = 1000;
 
 class GameController {
-    
+
     /*
      * Initialize a game that takes place on STAGE with dimensions WIDTH X
      *  HEIGHT
-     * 
+     *
      * STAGE: PIXI Container where the game will take place
      * WIDTH: Width of the app in pixels
      * HEIGHT: Height of the app in pixels
@@ -35,12 +35,12 @@ class GameController {
         this.stage = STAGE;
         this.width = WIDTH;
         this.height = HEIGHT;
-        
+
         this.gameActive = true;
-        
+
         this.endGameButton = new Sprite();
         this.ghost = new Sprite();
-        
+
         this.assetLoader = new Loader();
     }
 
@@ -75,7 +75,7 @@ class GameController {
             THIS.moveGhost(move_x);
         }
     }
-    
+
     moveGhost(NEW_X) {
         var functionCheckGameEnd = this.checkGameEnd(this);
         createjs.Tween.get(this.ghost.position).to({ x: NEW_X }, TWEEN_SPEED).call(functionCheckGameEnd);
@@ -88,7 +88,7 @@ class GameController {
     runGame() {
         this.setup();
     }
-    
+
     setup() {
         this.loadAssets();
         this.setupBackdrop();
@@ -98,7 +98,7 @@ class GameController {
         var functionOnClick = this.mouseupEventHandler(this);
         document.addEventListener("mouseup", functionOnClick);
     }
-    
+
     setupBackdrop() {
         let backdrop = new Sprite(Texture.from("backdrop.png"));
         this.stage.addChild(backdrop);
@@ -111,7 +111,7 @@ class GameController {
         this.endGameButton.anchor = ({ x: this.endGameButton.width / 2, y: this.endGameButton.height / 2 });
         this.stage.addChild(this.endGameButton);
     }
-    
+
     setupGhost() {
         this.ghost.texture = Texture.from("ghost.png");
         this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
