@@ -65,7 +65,7 @@ class GameController {
         
         this.endGameButton = new Sprite();
         this.ghost = new Sprite();
-        this.house;
+        this.houseArray = [];
 
         this.scrollingBG = new TilingSprite(Texture.from("tree_bg.png"), this.width, this.height);
 
@@ -75,9 +75,13 @@ class GameController {
         this.assetLoader = new Loader();
     }
     
-    addHouses() {
-        this.house = new House(this.houses);
-        this.house.addHouse(500);
+    addHouses(NUMBER) {
+        let counter = 0;
+        while (counter < NUMBER) {
+            this.houseArray.push(new House(this.houses));
+            this.houseArray[counter].addHouse(600 * (counter + 1));
+            counter++;
+        }
         this.stage.addChild(this.houses);
     }
 
@@ -101,15 +105,20 @@ class GameController {
 
     mouseupEventHandler(THIS) {
         return function (event) {
-            let move_x = event.offsetX - THIS.width / 2;
-            THIS.moveGhost(move_x);
+            if (event.offsetY > 300 && event.offsetY < 400) {
+                let move_x = event.offsetX - THIS.width / 2;
+                THIS.moveGhost(move_x);
+            }
         }
     }
     
     moveGhost(OFFSET) {
         //this.functionCheckGameEnd = this.checkGameEnd(this);
         createjs.Tween.get(this.scrollingBG.tilePosition).to({x: this.scrollingBG.tilePosition.x - OFFSET / 2}, TWEEN_SPEED);
-        this.house.moveHouse(OFFSET);
+        let i;
+        for (i = 0; i < this.houseArray.length; i++) {
+            this.houseArray[i].moveHouse(OFFSET);
+        }
     }
 
     resetGame() {
@@ -123,14 +132,15 @@ class GameController {
     
     setMouseListener() {
         this.functionOnClick = this.mouseupEventHandler(this);
-        document.addEventListener("mousedown", this.functionOnClick);
+        let target = document.getElementById("gameport");
+        target.addEventListener("mousedown", this.functionOnClick);
     }
     
     setup() {
         this.loadAssets();
         this.setupBackdrop();
         this.setupScrollingBG();
-        this.addHouses();
+        this.addHouses(5);
         this.setupGhost();
     }
     
