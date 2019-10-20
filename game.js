@@ -144,17 +144,13 @@ function dispGameOver()
   gameOverScene.visible = true;
 }
 
-function checkGameOver() {
+function animate()
+{
+  requestAnimationFrame(animate);
+
   if (!(newgame.isActive()))
   {
     dispGameOver();
   }
 }
-
-function animate()
-{
-  requestAnimationFrame(animate);
-}
 animate();
-
-setInterval(checkGameOver, 1000);
