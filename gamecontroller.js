@@ -16,8 +16,8 @@ let TextStyle = PIXI.TextStyle;
 let TilingSprite = PIXI.TilingSprite;
 
 // Constants
-const BOUND_LEFT = 150;
-const BOUND_RIGHT = 500;
+const BOUND_LEFT = -250;
+const BOUND_RIGHT = 2800;
 const GHOST_X = 400;
 const GHOST_Y = 350;
 const TWEEN_SPEED = 1000;
@@ -35,6 +35,17 @@ class House {
     addHouse(X) {
         this.house.position = ({x: X, y: 100});
         this.stage.addChild(this.house);
+    }
+    
+    hitTest(X, Y, OBJECT) {
+        if (OBJECT.position.x > this.house.position.x && OBJECT.position.x < this.house.position.x + 250) {
+            if (X > this.house.position.x && X < this.house.position.x + 300) {
+                if (Y > this.house.position.y && Y < this.house.position.y + 300) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     moveHouse(OFFSET) {
@@ -57,14 +68,15 @@ class GameController {
         this.width = WIDTH;
         this.height = HEIGHT;
         
+        this.distance = -250;
         this.gameActive = true;
         
         this.background = new Container();
         this.houses = new Container();
         this.foreground = new Container();
         
-        this.endGameButton = new Sprite();
         this.ghost = new Sprite();
+        
         this.houseArray = [];
 
         this.scrollingBG = new TilingSprite(Texture.from("tree_bg.png"), this.width, this.height);
@@ -105,14 +117,31 @@ class GameController {
 
     mouseupEventHandler(THIS) {
         return function (event) {
-            if (event.offsetY > 300 && event.offsetY < 400) {
+            let check = false;
+            let i = 0;
+            while (!check && i < THIS.houseArray.length) {
+                check = THIS.houseArray[i].hitTest(event.offsetX, event.offsetY, THIS.ghost);
+                i++;
+            }
+            if (check) {
+                console.log("load match game");
+            }
+            else if (event.offsetY > 300 && event.offsetY < 400 && THIS.distance >= BOUND_LEFT && THIS.distance <= BOUND_RIGHT) {
                 let move_x = event.offsetX - THIS.width / 2;
+                if (THIS.distance + move_x < BOUND_LEFT) {
+                    move_x = BOUND_LEFT - THIS.distance;
+                }
+                if (THIS.distance + move_x > BOUND_RIGHT) {
+                    move_x = BOUND_RIGHT - THIS.distance;
+                }
+                
                 THIS.moveGhost(move_x);
             }
         }
     }
     
     moveGhost(OFFSET) {
+        this.distance += OFFSET;
         //this.functionCheckGameEnd = this.checkGameEnd(this);
         createjs.Tween.get(this.scrollingBG.tilePosition).to({x: this.scrollingBG.tilePosition.x - OFFSET / 2}, TWEEN_SPEED);
         let i;
