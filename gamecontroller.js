@@ -1,7 +1,7 @@
 // gamecontroller.js
 
 /*
- * 
+ *
  */
 
 // Alias Declarations
@@ -81,11 +81,11 @@ class House {
 }
 
 class GameController {
-    
+
     /*
      * Initialize a game that takes place on STAGE with dimensions WIDTH X
      *  HEIGHT
-     * 
+     *
      * STAGE: PIXI Container where the game will take place
      * WIDTH: Width of the app in pixels
      * HEIGHT: Height of the app in pixels
@@ -132,7 +132,7 @@ class GameController {
 
         // Class property to represent the function so that it can be removed
         this.functionOnClick;
-        
+
         this.assetLoader = new Loader();
 
         // Setup the stage with the assets
@@ -208,6 +208,14 @@ class GameController {
         for (i = 0; i < this.houseArray.length; i++) {
             this.houseArray[i].moveHouse(OFFSET);
         }
+
+    moveGhost(NEW_X) {
+        var functionCheckGameEnd = this.checkGameEnd(this);
+        createjs.Tween.get(this.ghost.position).to({ x: NEW_X }, TWEEN_SPEED).call(functionCheckGameEnd);
+        let i;
+        for (i = 0; i < this.houseArray.length; i++) {
+            this.houseArray[i].moveHouse(OFFSET);
+        }
     }
 
     // Resets game back to starting state
@@ -244,6 +252,24 @@ class GameController {
     }
     
     // Add the player character (a ghost)
+    setupGhost() {
+        var functionOnClick = this.mouseupEventHandler(this);
+        document.addEventListener("mouseup", functionOnClick);
+    }
+
+    setupBackdrop() {
+        let backdrop = new Sprite(Texture.from("backdrop.png"));
+        this.stage.addChild(backdrop);
+    }
+
+    // For testing purposes only
+    setupEndGame() {
+        this.endGameButton.texture = Texture.from("endgame.png");
+        this.endGameButton.position = ({ x: BOUND_RIGHT, y: GHOST_Y });
+        this.endGameButton.anchor = ({ x: this.endGameButton.width / 2, y: this.endGameButton.height / 2 });
+        this.stage.addChild(this.endGameButton);
+    }
+
     setupGhost() {
         this.ghost.texture = Texture.from("ghost.png");
         this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
