@@ -22,6 +22,7 @@ var menuText;
 
 //menu text
 var titleReturnText;
+var resetText;
 var exitText;
 
 var gameOverText;
@@ -86,22 +87,29 @@ function gameSetup()
 function menuSetup()
 {
   titleReturnText = new PIXI.Text("Return to title screen", {fill : 0xff1010});
+  resetText = new PIXI.Text("Start Over", {fill : 0xff1010});
   exitText = new PIXI.Text("Exit", {fill : 0xff1010});
 
   menuScene.addChild(titleReturnText);
+  menuScene.addChild(resetText);
   menuScene.addChild(exitText);
 
   titleReturnText.position.x = 200;
   titleReturnText.position.y = 200;
+  resetText.position.x = 200;
+  resetText.position.y = 250;
   exitText.position.x = 200;
-  exitText.position.y = 250;
+  exitText.position.y = 300;
 
   titleReturnText.interactive = true;
   titleReturnText.buttonMode = true;
+  resetText.interactive = true;
+  resetText.buttonMode = true;
   exitText.interactive = true;
   exitText.buttonMode = true;
 
   titleReturnText.on('mousedown', dispTitle);
+  resetText.on('mousedown', resetGame);
   exitText.on('mousedown', dispGame);
 }
 
@@ -142,6 +150,12 @@ function dispGameOver()
 {
   gameScene.visible = false;
   gameOverScene.visible = true;
+}
+
+function resetGame()
+{
+  newgame.runGame();
+  dispGame();
 }
 
 function animate()
