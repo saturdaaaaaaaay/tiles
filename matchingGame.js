@@ -12,8 +12,8 @@ class matchingGame
 	
 	function startGame()
 	{
-		setBoard();
-		playGame();
+		//setBoard();
+		//playGame();
 		return score;
 	}
 	
@@ -41,6 +41,18 @@ class matchingGame
 		
 	}
 	
+	var getUserInput = setInterval(function(){
+		if (bug_count >= 5)
+		{
+			bug_x_square = Math.round(((Math.random()) * 7) + 1);
+			bug_y_square = Math.round(((Math.random()) * 7) + 1);
+	
+			new_bug_x = bug_x_square * 40 + 20;
+			new_bug_y = bug_y_square * 40 + 20;
+		
+			createjs.Tween.get(bug).to({x: new_bug_x, y: new_bug_y}, 1000).call(tweenFinish, [new_bug_x, new_bug_y]);
+		}
+	}, 3000);
 	
 }
 
