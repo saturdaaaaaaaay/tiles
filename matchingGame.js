@@ -5,8 +5,22 @@ class matchingGame
 		var matching_container = new PIXI.Container();
 		var existing_stage = container;
 		existing_stage.addChild(matching_container);
+		
+		var game_finished = false;
+		var score = 5;
 	}
 	
+	function startGame()
+	{
+		setBoard();
+		playGame();
+		return score;
+	}
+	
+	function playGame()
+	{
+		// will contain logic for the matching game
+	}
 	
 	function setBoard()
 	{
