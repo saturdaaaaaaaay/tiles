@@ -110,6 +110,7 @@ class GameController {
          * Stage <- Background <- Scrolling Background
          * Stage <- Houses <- House (multiple, scrolling)
          * Stage <- Foreground <- Ghost, UI
+         * Stage <- MatchGameScene <- Matching Game (multiple)
          */
         this.stage.addChild(new Sprite(Texture.from("backdrop.png")));
         
@@ -121,6 +122,9 @@ class GameController {
         
         this.foreground = new Container();
         this.stage.addChild(this.foreground);
+        
+        this.matchGameScene = new Container();
+        this.stage.addChild(this.matchGameScene);
         
         // Player character
         this.ghost = new Sprite();
@@ -178,7 +182,7 @@ class GameController {
                 i++;
             }
             if (check) {
-                console.log("load match game");
+                THIS.runMatchingGame(THIS);
                 THIS.houseArray[i - 1].deactivateHouse();
                 THIS.completed++;
                 THIS.checkGameEnd(THIS);
@@ -212,7 +216,7 @@ class GameController {
 
     // Resets game back to starting state
     resetGame() {
-        this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
+        this.scrollingBG.tilePosition = ({x: 0, y: 0});
         this.distance = BOUND_LEFT;
         this.completed = 0;
         this.gameActive = true;
@@ -227,6 +231,12 @@ class GameController {
     runGame() {
         this.resetGame();
         this.setMouseListener();
+    }
+    
+    // Start a new matching game mini game
+    runMatchingGame(THIS) {
+        let matchGame = new matchingGame(THIS.matchGameScene);
+        console.log(matchGame.startGame());
     }
     
     // Add a mouse listener to the game
