@@ -33,10 +33,42 @@ class matchingGame
 		this.card_types = ["cat", "wolf", "tree"];
 		this.card_type_numbers = [0, 0, 0];
 		this.cards = 0;
+		this.cards = [];
 		
-		while (this.cards <= 6)
+		while (this.cards < 6)
 		{
 			this.random_card = Math.round(((Math.random()) * 2) + 1);
+			
+			if (this.random_card === 1)
+			{
+				// make cat
+				if (this.cards[0] < 2)
+				{
+					this.new_card = new Card("cat");
+					this.cards.push(this.new_card);
+					this.card_type_numbers[0] += 1;
+				}
+			}
+			else if (this.random_card === 2)
+			{
+				// make wolf
+				if (this.cards[1] < 2)
+				{
+					this.new_card = new Card("wolf");
+					this.cards.push(this.new_card);
+					this.card_type_numbers[1] += 1;
+				}
+			}
+			else (this.random_card === 3)
+			{
+				// make tree
+				if (this.cards[2] < 2)
+				{
+					this.new_card = new Card("tree");
+					this.cards.push(this.new_card);
+					this.card_type_numbers[2] += 1;
+				}
+			}
 		}
 		
 		// need 6 total cards
@@ -67,7 +99,7 @@ class matchingGame
 
 
 
-class card
+class Card
 {	
 	constructor(type_input)
 	{
@@ -82,18 +114,22 @@ class card
 		
 		this.card_front;
 		this.card_back = new PIXI.Sprite(pumpkin);
+		this.card_pic;
 		
 		if (type_input === "cat")
 		{
 			this.card_front = new PIXI.Sprite(cat_pic);
+			this.card_pic = "cat";
 		}
 		else if (type_input === "wolf")
 		{
 			this.card_front = new PIXI.Sprite(wolf_pic);
+			this.card_pic = "wolf";
 		}
 		else
 		{
-			this.card_front = new PIXI.Sprint(tree_pic);
+			this.card_front = new PIXI.Sprite(tree_pic);
+			this.card_pic = "tree";
 		}
 		
 		this.matching_container.addChild(this.card_back);
