@@ -27,6 +27,12 @@ var exitText;
 
 var gameOverText;
 
+//var noise;
+
+PIXI.sound.add("selectNoise", "select.mp3");
+
+//var selectNoise;
+
 PIXI.Loader.shared.add("assets.json").load(setup);
 
 //set up game
@@ -47,6 +53,8 @@ function setup()
   gameScene.visible = false;
   menuScene.visible = false;
   gameOverScene.visible = false;
+
+  //noise = new PIXI.sound;
 
   titleSetup();
   gameSetup();
@@ -122,6 +130,7 @@ function gameOverSetup()
 
 function dispTitle()
 {
+  //PIXI.sound.play("select.mp3");
   titleScene.visible = true;
   gameScene.visible = false;
   menuScene.visible = false;
@@ -129,6 +138,7 @@ function dispTitle()
 
 function dispGame()
 {
+  PIXI.sound.play("selectNoise");
   titleScene.visible = false;
   gameScene.visible = true;
   menuScene.visible = false;
@@ -142,12 +152,14 @@ function dispGame()
 
 function dispMenu()
 {
+  PIXI.sound.play("selectNoise");
   gameScene.visible = false;
   menuScene.visible = true;
 }
 
 function dispGameOver()
 {
+  PIXI.sound.play("selectNoise");
   gameScene.visible = false;
   gameOverScene.visible = true;
 }
