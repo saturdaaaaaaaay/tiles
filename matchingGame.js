@@ -2,35 +2,41 @@ class matchingGame
 {
 	constructor(container)
 	{
-		var matching_container = new PIXI.Container();
-		var existing_stage = container;
-		existing_stage.addChild(matching_container);
+		this.matching_container = new PIXI.Container();
+		this.existing_stage = container;
+		this.existing_stage.addChild(this.matching_container);
 		
-		var game_finished = false;
-		var score = 5;
+		this.game_finished = false;
+		this.score = 5;
+		this.flipped_cards = 0;
 	}
 	
-	function startGame()
+	startGame()
 	{
 		//setBoard();
 		//playGame();
 		return score;
 	}
 	
-	function playGame()
+	playGame()
 	{
 		// will contain logic for the matching game
+		
+		if (this.flipped_cards === 2)
+		{
+			checkForMatch();
+		}
 	}
 	
-	function setBoard()
+	setBoard()
 	{
-		const card_types = ["cat", "wolf", "tree"];
-		var card_type_numbers = [0, 0, 0];
-		var cards = 0;
+		this.card_types = ["cat", "wolf", "tree"];
+		this.card_type_numbers = [0, 0, 0];
+		this.cards = 0;
 		
-		while (cards <= 6)
+		while (this.cards <= 6)
 		{
-			var random_card = Math.round(((Math.random()) * 2) + 1);
+			this.random_card = Math.round(((Math.random()) * 2) + 1);
 		}
 		
 		// need 6 total cards
@@ -41,7 +47,8 @@ class matchingGame
 		
 	}
 	
-	var getUserInput = setInterval(function(){
+	/*
+	this.getUserInput = setInterval(function(){
 		if (bug_count >= 5)
 		{
 			bug_x_square = Math.round(((Math.random()) * 7) + 1);
@@ -53,6 +60,8 @@ class matchingGame
 			createjs.Tween.get(bug).to({x: new_bug_x, y: new_bug_y}, 1000).call(tweenFinish, [new_bug_x, new_bug_y]);
 		}
 	}, 3000);
+	*/
+	
 	
 }
 
@@ -62,40 +71,40 @@ class card
 {	
 	constructor(type_input)
 	{
-		const card_type = type_input;
-		var flipped = false;
-		var times_flipped = 0;
+		this.card_type = type_input;
+		this.flipped = false;
+		this.times_flipped = 0;
 		
-		var cat_pic = PIXI.Texture.fromImage("Sprites/cat");
-		var wolf_pic = PIXI.Texture.fromImage("Sprites/wolf");
-		var tree_pic = PIXI.Texture.fromImage("Sprites/tree");
-		var pumpkin = PIXI.Texture.fromImage("Sprites/pumpkin");
+		this.cat_pic = PIXI.Texture.fromImage("Sprites/cat");
+		this.wolf_pic = PIXI.Texture.fromImage("Sprites/wolf");
+		this.tree_pic = PIXI.Texture.fromImage("Sprites/tree");
+		this.pumpkin = PIXI.Texture.fromImage("Sprites/pumpkin");
 		
-		var card_front;
-		var card_back = new PIXI.Sprite(pumpkin);
+		this.card_front;
+		this.card_back = new PIXI.Sprite(pumpkin);
 		
 		if (type_input === "cat")
 		{
-			card_front = new PIXI.Sprite(cat_pic);
+			this.card_front = new PIXI.Sprite(cat_pic);
 		}
 		else if (type_input === "wolf")
 		{
-			card_front = new PIXI.Sprite(wolf_pic);
+			this.card_front = new PIXI.Sprite(wolf_pic);
 		}
 		else
 		{
-			card_front = new PIXI.Sprint(tree_pic);
+			this.card_front = new PIXI.Sprint(tree_pic);
 		}
 		
-		matching_container.addChild(card_back);
+		this.matching_container.addChild(this.card_back);
 		
 	}
 	
-	function flipCard()
+	flipCard()
 	{
-		if (flipped === false)
+		if (this.flipped === false)
 		{
-				// look up visible property for sprites
+			// look up visible property for sprites
 		}
 		else
 		{
