@@ -15,7 +15,7 @@ class matchingGame
 	{
 		//setBoard();
 		//playGame();
-		return score;
+		return this.score;
 	}
 	
 	playGame()
