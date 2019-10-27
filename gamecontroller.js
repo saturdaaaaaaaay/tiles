@@ -16,11 +16,20 @@ let TextStyle = PIXI.TextStyle;
 let TilingSprite = PIXI.TilingSprite;
 
 // Constants
-const BOUND_LEFT = -250;
-const BOUND_RIGHT = 2800;
-const GHOST_X = 400;
-const GHOST_Y = 350;
+const ANIM_SPEED = 0.07;
+const BOUND_LEFT = 100;
+const BOUND_RIGHT = 600;
+const BOUND_TOP = 100;
+const BOUND_BOTTOM = 300;
+const GHOST_X = 350;
+const GHOST_Y = 200;
 const TWEEN_SPEED = 1000;
+
+const TILE_SIZE = 300;
+const GRASS = 10;
+const HOUSE = 11;
+const ROAD = 12;
+const TREE = 13;
 
 // ####################################### CLASSES ############################
 
@@ -36,13 +45,11 @@ class House {
         // Signals if the house is active or not
         this.lightOn = true;
         
-        this.assetloader = new Loader();
-        this.assetloader.add("house.png");
-        
         // "house" is actually a container holding building and light
         this.house = new Container();
-        this.building = new Sprite(Texture.from("house.png"));
+        this.building = new Sprite(Texture.from("pg_house_tile.png"));
         this.light = new Sprite(Texture.from("light.png"));
+        this.house.visible = false;
     }
     
     // A house is a container with a building and a light.
@@ -77,6 +84,67 @@ class House {
     // Moves the house as the player "moves" (scrolling bg style)
     moveHouse(OFFSET) {
         createjs.Tween.get(this.house.position).to({x: this.house.position.x - OFFSET}, TWEEN_SPEED);
+    }
+}
+
+class Tile {
+    constructor(TYPE) {
+        this.description = TYPE;
+        this.sprite = new Sprite();
+        
+        this.createSprite();
+    }
+    
+    createSprite() {
+        switch(this.description) {
+            case GRASS:
+                this.sprite.texture = Texture.from("grass_tile.png");
+                break;
+            case HOUSE:
+                this.sprite.texture = Texture.from("pg_house_tile.png");
+                break;
+            case TREE:
+                this.sprite.texture = Texture.from("tree_1_tile.png");
+                break;
+            case ROAD:
+                this.sprite.texture = Texture.from("road_tile.png");
+                break;
+        }
+    }
+}
+
+class Tiles {
+    constructor(WIDTH, HEIGHT, STAGE, TILE_DATA) {
+        this.stage = STAGE;
+        this.tiles_width = WIDTH;
+        this.tiles_height = HEIGHT;
+        this.tiles_count = WIDTH * HEIGHT;
+        
+        this.stage.width = WIDTH * TILE_SIZE;
+        this.stage.height = HEIGHT * TILE_SIZE;
+        
+        this.tiles = [];
+        
+        this.populateTiles(TILE_DATA);
+        this.addToStage();
+    }
+    
+    addToStage() {
+        let width_index, height_index, index;
+        for (height_index = 0; height_index < this.tiles_height; height_index++) {
+            for (width_index = 0; width_index < this.tiles_width; width_index++) {
+                index = height_index * this.tiles_width + width_index;
+                this.tiles[index].sprite.position = ({x: width_index * TILE_SIZE, y: height_index * TILE_SIZE});
+                this.stage.addChild(this.tiles[index].sprite);
+            }
+        }
+    }
+    
+    populateTiles(TILE_DATA) {
+        let index;
+        for (index = 0; index < this.tiles_count; index++) {
+            this.tiles.push(new Tile(TILE_DATA.shift()));
+        }
     }
 }
 
@@ -127,10 +195,14 @@ class GameController {
         this.stage.addChild(this.matchGameScene);
         
         // Player character
-        this.ghost = new Sprite();
+        this.ghost;
+        this.ghost_walking;
+        this.ghost_stand_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-stand"];
+        this.ghost_walk_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-walk"];
         
         // Array of houses
         this.houseArray = [];
+        this.tiles;
 
         this.scrollingBG = new TilingSprite(Texture.from("tree_bg.png"), this.width, this.height);
 
@@ -171,52 +243,64 @@ class GameController {
     }
 
     // Handles all the mouse clicking in-game
-    mouseupEventHandler(THIS) {
+    mousedownEventHandler(THIS) {
         return function (event) {
-            let check = false;
-            let i = 0;
-            
-            // Check to see if a house is activated
-            while (!check && i < THIS.houseArray.length) {
-                check = THIS.houseArray[i].hitTest(event.offsetX, event.offsetY, THIS.ghost);
-                i++;
-            }
-            if (check) {
-                THIS.runMatchingGame(THIS);
-                THIS.houseArray[i - 1].deactivateHouse();
-                THIS.completed++;
-                THIS.checkGameEnd(THIS);
-            }
-            
-            // No house activated, so move player
-            else if (event.offsetY > 300 && event.offsetY < 400 && THIS.distance >= BOUND_LEFT && THIS.distance <= BOUND_RIGHT) {
-                let move_x = event.offsetX - THIS.width / 2;
-                if (THIS.distance + move_x < BOUND_LEFT) {
-                    move_x = BOUND_LEFT - THIS.distance;
+            let move_x = event.offsetX;
+            let move_y = event.offsetY;
+            let remainder_x = 0;
+            let remainder_y = 0;
+      
+            if (move_x < BOUND_LEFT) {
+                remainder_x = move_x - BOUND_LEFT;
+                if (THIS.background.position.x + remainder_x < 0) {
+                    remainder_x = 0 - THIS.background.position.x;
                 }
-                if (THIS.distance + move_x > BOUND_RIGHT) {
-                    move_x = BOUND_RIGHT - THIS.distance;
-                }
-                
-                THIS.moveGhost(move_x);
+                move_x = BOUND_LEFT;
             }
+            else if (move_x > BOUND_RIGHT) {
+                remainder_x = BOUND_RIGHT - move_x;
+                if (THIS.background.position.x + remainder_x < THIS.width - THIS.stage.width) {
+                    remainder_x = THIS.width - THIS.stage.width - THIS.background.position.x;
+                }
+                move_x = BOUND_RIGHT;
+            }
+            if (move_y < BOUND_TOP) {
+                remainder_y = move_y - BOUND_TOP;
+                if (THIS.background.position.y + remainder_y < 0) {
+                    remainder_y = 0 - THIS.background.position.y;
+                }
+                move_y = BOUND_TOP;
+            }
+            else if (move_y > BOUND_BOTTOM) {
+                remainder_y = BOUND_BOTTOM - move_y;
+                if (THIS.background.position.y + remainder_y < THIS.height - THIS.stage.height) {
+                    remainder_y = THIS.height - THIS.stage.height - THIS.background.position.y;
+                }
+                move_y = BOUND_BOTTOM;
+            }
+            
+            THIS.moveGhost(move_x, move_y);
+            THIS.moveBG(remainder_x, remainder_y);
         }
     }
     
-    // Handles "movement" of the player (moves background and houses)
-    moveGhost(OFFSET) {
-        this.distance += OFFSET;
-        //this.functionCheckGameEnd = this.checkGameEnd(this);
-        createjs.Tween.get(this.scrollingBG.tilePosition).to({x: this.scrollingBG.tilePosition.x - OFFSET / 2}, TWEEN_SPEED);
-        let i;
-        for (i = 0; i < this.houseArray.length; i++) {
-            this.houseArray[i].moveHouse(OFFSET);
-        }
+    moveBG(OFFSET_X, OFFSET_Y) {
+        createjs.Tween.get(this.background.position).to({x: this.background.position.x + OFFSET_X, y: this.background.position.y + OFFSET_Y}, TWEEN_SPEED);
+    }
+    
+    // Handles "movement" of the player
+    moveGhost(NEW_X, NEW_Y) {
+        createjs.Tween.get(this.ghost_walking.position).to({x: NEW_X, y: NEW_Y}, TWEEN_SPEED);
+    }
+    
+    removeMouseListener() {
+        let target = document.getElementById("gameport");
+        target.removeEventListener("mousedown", this.functionOnClick);
     }
 
     // Resets game back to starting state
     resetGame() {
-        this.scrollingBG.tilePosition = ({x: 0, y: 0});
+        //this.scrollingBG.tilePosition = ({x: 0, y: 0});
         this.distance = BOUND_LEFT;
         this.completed = 0;
         this.gameActive = true;
@@ -241,9 +325,9 @@ class GameController {
     
     // Add a mouse listener to the game
     setMouseListener() {
-        this.functionOnClick = this.mouseupEventHandler(this);
+        this.functionOnClick = this.mousedownEventHandler(this);
         let target = document.getElementById("gameport");
-        target.addEventListener("mouseup", this.functionOnClick);
+        target.addEventListener("mousedown", this.functionOnClick);
     }
     
     // Various tasks for setting up the game
@@ -255,14 +339,40 @@ class GameController {
     
     // Add the player character (a ghost)
     setupGhost() {
-        this.ghost.texture = Texture.from("ghost.png");
+        this.ghost = new AnimatedSprite(this.ghost_stand_anim);
+        this.ghost_walking = new AnimatedSprite(this.ghost_walk_anim);
+        this.ghost.animationSpeed = ANIM_SPEED;
+        this.ghost_walking.animationSpeed = ANIM_SPEED;
+        this.ghost.play();
+        this.ghost_walking.play();
         this.ghost.position = ({x: GHOST_X, y: GHOST_Y});
-        this.ghost.anchor = ({x: this.ghost.width / 2, y: this.ghost.height / 2});
-        this.foreground.addChild(this.ghost);
+        //this.foreground.addChild(this.ghost);
+
+        this.ghost_walking.position = ({x: GHOST_X, y: GHOST_Y});
+        this.foreground.addChild(this.ghost_walking);
+        //this.ghost_walking.visible = false;
     }
     
     // Add a scrolling background
     setupScrollingBG() {
-        this.background.addChild(this.scrollingBG);
+        //this.background.addChild(this.scrollingBG);
+        
+        this.tile_data = [
+            GRASS, GRASS, GRASS,
+            TREE, HOUSE, TREE,
+            ROAD, ROAD, ROAD,
+            TREE, HOUSE, TREE,
+            GRASS, GRASS, GRASS
+        ];
+        
+        this.tiles = new Tiles(3, 5, this.background, this.tile_data);
+        
+        this.background.position.x = this.width / 2 - this.background.width / 2;
+        this.background.position.y = this.height / 2 - this.background.height / 2;
+    }
+    
+    toggleGhostAnim() {
+        this.ghost.visible = !this.ghost.visble;
+        this.ghost_walking.visible = !this.ghost_walking.visible;
     }
 }

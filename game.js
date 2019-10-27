@@ -27,13 +27,10 @@ var exitText;
 
 var gameOverText;
 
-//var noise;
-
-PIXI.sound.add("selectNoise", "select.mp3");
-
-//var selectNoise;
-
-PIXI.Loader.shared.add("assets.json").load(setup);
+PIXI.Loader.shared
+    .add("ghost.json")
+    .add("tileset.json")
+    .load(setup);
 
 //set up game
 function setup()
@@ -42,7 +39,7 @@ function setup()
   gameScene = new PIXI.Container();
   menuScene = new PIXI.Container();
   gameOverScene = new PIXI.Container();
-
+  
   newgame = new GameController(gameScene, 800, 500);
 
   app.stage.addChild(titleScene);
@@ -53,8 +50,6 @@ function setup()
   gameScene.visible = false;
   menuScene.visible = false;
   gameOverScene.visible = false;
-
-  //noise = new PIXI.sound;
 
   titleSetup();
   gameSetup();
@@ -130,7 +125,6 @@ function gameOverSetup()
 
 function dispTitle()
 {
-  //PIXI.sound.play("select.mp3");
   titleScene.visible = true;
   gameScene.visible = false;
   menuScene.visible = false;
@@ -138,11 +132,11 @@ function dispTitle()
 
 function dispGame()
 {
-  PIXI.sound.play("selectNoise");
   titleScene.visible = false;
   gameScene.visible = true;
   menuScene.visible = false;
   newgame.runGame();
+  //gc_newGame(gameScene);
 
 
   gameScene.addChild(menuText);
@@ -152,14 +146,12 @@ function dispGame()
 
 function dispMenu()
 {
-  PIXI.sound.play("selectNoise");
   gameScene.visible = false;
   menuScene.visible = true;
 }
 
 function dispGameOver()
 {
-  PIXI.sound.play("selectNoise");
   gameScene.visible = false;
   gameOverScene.visible = true;
 }
@@ -170,13 +162,16 @@ function resetGame()
   dispGame();
 }
 
-function animate()
-{
-  requestAnimationFrame(animate);
-
-  if (!(newgame.isActive()))
+function checkGameActive() {
+  if (!newgame.isActive())
   {
     dispGameOver();
   }
 }
+
+function animate()
+{
+  requestAnimationFrame(animate);
+}
 animate();
+setInterval(checkGameActive, 500);
