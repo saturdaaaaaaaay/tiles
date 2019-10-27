@@ -8,7 +8,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":300,"h":300},
 	"sourceSize": {"w":300,"h":300}
 },
-"pg_house_tile.png":
+"light.png":
 {
 	"frame": {"x":300,"y":0,"w":300,"h":300},
 	"rotated": false,
@@ -16,7 +16,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":300,"h":300},
 	"sourceSize": {"w":300,"h":300}
 },
-"ro_house_tile.png":
+"pg_house_tile.png":
 {
 	"frame": {"x":600,"y":0,"w":300,"h":300},
 	"rotated": false,
@@ -24,9 +24,17 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":300,"h":300},
 	"sourceSize": {"w":300,"h":300}
 },
+"ro_house_tile.png":
+{
+	"frame": {"x":0,"y":300,"w":300,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":300,"h":300},
+	"sourceSize": {"w":300,"h":300}
+},
 "road_tile.png":
 {
-	"frame": {"x":900,"y":0,"w":300,"h":300},
+	"frame": {"x":300,"y":300,"w":300,"h":300},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":300,"h":300},
@@ -34,7 +42,7 @@
 },
 "tree_1_tile.png":
 {
-	"frame": {"x":1200,"y":0,"w":300,"h":300},
+	"frame": {"x":600,"y":300,"w":300,"h":300},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":300,"h":300},
@@ -42,7 +50,7 @@
 },
 "tree_2_tile.png":
 {
-	"frame": {"x":1500,"y":0,"w":300,"h":300},
+	"frame": {"x":0,"y":600,"w":300,"h":300},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":300,"h":300},
@@ -53,8 +61,8 @@
 	"version": "1.0",
 	"image": "tileset.png",
 	"format": "RGBA8888",
-	"size": {"w":1800,"h":300},
+	"size": {"w":900,"h":900},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:15d19a9aa9393ca3e1e3e0d1dd81fec4:600eb97c1d405aa347d811390eae6f02:ace0e5e82375743ccde85e973fd84fb5$"
+	"smartupdate": "$TexturePacker:SmartUpdate:e43725e3cdd287e5d6454d0a58a6a106:6a76370702c00c98f6c62d74e13ab906:ace0e5e82375743ccde85e973fd84fb5$"
 }
 }
