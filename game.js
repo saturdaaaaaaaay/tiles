@@ -1,6 +1,5 @@
 //set up gameport, renderer, and stage
 var gameport = document.getElementById("gameport");
-//var renderer = PIXI.autoDetectRenderer(200, 500, {backgroundColor: 0x000000});
 var app = new PIXI.Application({width: 800, height: 500});
 gameport.appendChild(app.view);
 
@@ -27,6 +26,9 @@ var exitText;
 
 var gameOverText;
 
+//menu select sound effect
+PIXI.sound.add("selectNoise", "select.mp3");
+
 PIXI.Loader.shared
     .add("ghost.json")
     .add("tileset.json")
@@ -39,7 +41,7 @@ function setup()
   gameScene = new PIXI.Container();
   menuScene = new PIXI.Container();
   gameOverScene = new PIXI.Container();
-  
+
   newgame = new GameController(gameScene, 800, 500);
 
   app.stage.addChild(titleScene);
@@ -125,6 +127,7 @@ function gameOverSetup()
 
 function dispTitle()
 {
+  PIXI.sound.play("selectNoise");
   titleScene.visible = true;
   gameScene.visible = false;
   menuScene.visible = false;
@@ -132,6 +135,7 @@ function dispTitle()
 
 function dispGame()
 {
+  PIXI.sound.play("selectNoise");
   titleScene.visible = false;
   gameScene.visible = true;
   menuScene.visible = false;
@@ -146,6 +150,7 @@ function dispGame()
 
 function dispMenu()
 {
+  PIXI.sound.play("selectNoise");
   gameScene.visible = false;
   menuScene.visible = true;
 }
@@ -158,6 +163,7 @@ function dispGameOver()
 
 function resetGame()
 {
+  PIXI.sound.play("selectNoise");
   newgame.runGame();
   dispGame();
 }
