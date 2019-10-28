@@ -152,7 +152,7 @@ class GameController {
         
         // Houses completed vs goal
         this.completed = 0;
-        this.goal = 5;
+        this.goal = 4;
 
         // Scene Graph
         /*
@@ -220,6 +220,8 @@ class GameController {
             if (THIS.atHouse) {
                 THIS.runMatchingGame(THIS);
                 THIS.atHouse = false;
+                THIS.completed++;
+                THIS.checkGameEnd(THIS);
             }
             // Do movement
             else if (THIS.canMove) {
@@ -283,9 +285,12 @@ class GameController {
     // Resets game back to starting state
     resetGame() {
         this.ghost_walking.position = ({x: this.GHOST_X, y: this.GHOST_Y});
+        this.setupScrollingBG();
         
-        this.completed = 0;
+        this.atHouse = false;
+        this.canMove = true;
         this.gameActive = true;
+        this.completed = 0;
     }
 
     // Start a new game
@@ -338,14 +343,14 @@ class GameController {
     // Add a scrolling background
     setupScrollingBG() {        
         this.tile_data = [
-            GRASS, GRASS, GRASS,
-            TREE, HOUSE, TREE,
-            ROAD, ROAD, ROAD,
-            TREE, HOUSE, TREE,
-            GRASS, GRASS, GRASS
+            GRASS, GRASS, GRASS, GRASS, GRASS,
+            TREE, HOUSE, TREE, HOUSE, TREE,
+            ROAD, ROAD, ROAD, ROAD, ROAD,
+            TREE, HOUSE, TREE, HOUSE, TREE,
+            GRASS, GRASS, GRASS, GRASS, GRASS
         ];
         
-        this.tiles = new Tiles(3, 5, this.background, this.tile_data);
+        this.tiles = new Tiles(5, 5, this.background, this.tile_data);
         
         this.background.position.x = this.width / 2 - this.background.width / 2;
         this.background.position.y = this.height / 2 - this.background.height / 2;
