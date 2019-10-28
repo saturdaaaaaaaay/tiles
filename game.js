@@ -39,6 +39,7 @@ PIXI.sound.add("selectNoise", "select.mp3");
 PIXI.Loader.shared
     .add("ghost.json")
     .add("tileset.json")
+    .add("buttons.json")
     .load(setup);
 
 //set up game
@@ -78,9 +79,15 @@ function setup()
 function titleSetup()
 {
   titleText = new PIXI.Text("Untitled Trick or Treat Game", {fill : 0xff1010});
+  /*
   startText = new PIXI.Text("Start", {fill : 0xff1010});
   howToPlayText = new PIXI.Text("How to play", {fill : 0xff1010});
   creditText = new PIXI.Text("Credits", {fill : 0xff1010});
+  */
+
+  startText = new PIXI.Sprite(PIXI.Texture.fromFrame("play.png"));
+  howToPlayText = new PIXI.Sprite(PIXI.Texture.fromFrame("howtoplay.png"));
+  creditText = new PIXI.Sprite(PIXI.Texture.fromFrame("credits.png"));
 
   titleScene.addChild(titleText);
   titleScene.addChild(startText);
@@ -88,13 +95,13 @@ function titleSetup()
   titleScene.addChild(creditText);
 
   titleText.position.x = 200;
-  titleText.position.y = 200;
+  titleText.position.y = 50;
   startText.position.x = 200;
-  startText.position.y = 250;
+  startText.position.y = 100;
   howToPlayText.position.x = 200;
-  howToPlayText.position.y = 300;
+  howToPlayText.position.y = 200;
   creditText.position.x = 200;
-  creditText.position.y = 350;
+  creditText.position.y = 300;
 
   startText.interactive = true;
   startText.buttonMode = true;
@@ -110,8 +117,14 @@ function titleSetup()
 
 function gameSetup()
 {
-  //newgame.runGame();
-  menuText =  new PIXI.Text("Menu", {fill : 0x000000});
+  newgame.runGame();
+  //menuText =  new PIXI.Text("Menu", {fill : 0x000000});
+  menuText = new PIXI.Sprite(PIXI.Texture.fromFrame("menu.png"));
+
+  gameScene.addChild(menuText);
+
+  menuText.position.x = 700;
+  menuText.position.y = 20;
 
   menuText.interactive = true;
   menuText.buttonMode = true;
@@ -121,10 +134,17 @@ function gameSetup()
 
 function menuSetup()
 {
+  /*
   titleReturnText = new PIXI.Text("Return to title screen", {fill : 0xff1010});
   resetText = new PIXI.Text("Start Over", {fill : 0xff1010});
   howToPlayText = new PIXI.Text("How to play", {fill : 0xff1010});
   exitText = new PIXI.Text("Exit", {fill : 0xff1010});
+  */
+
+  titleReturnText = new PIXI.Sprite(PIXI.Texture.fromFrame("return.png"));
+  resetText = new PIXI.Sprite(PIXI.Texture.fromFrame("startover.png"));
+  howToPlayText = new PIXI.Sprite(PIXI.Texture.fromFrame("howtoplay.png"));
+  exitText = new PIXI.Sprite(PIXI.Texture.fromFrame("cancel.png"));
 
   menuScene.addChild(titleReturnText);
   menuScene.addChild(resetText);
@@ -208,6 +228,15 @@ function dispTitle()
   gameScene.removeChildren();
   newgame = new GameController(gameScene, 800, 500);
   //newgame.runGame();
+  //
+
+  /*
+  var ghost_walk_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-walk"];
+  var ghost_walking = new AnimatedSprite(this.ghost_walk_anim);
+  */
+
+  titleScene.addChild(ghost_walking);
+
   gameSetup();
 }
 
@@ -220,10 +249,11 @@ function dispGame()
   newgame.runGame();
   //gc_newGame(gameScene);
 
-
+  /*
   gameScene.addChild(menuText);
   menuText.position.x = 720;
   menuText.position.y = 0;
+  */
 }
 
 function dispHowToPlay()
