@@ -11,9 +11,6 @@ let Loader = PIXI.Loader;
 let Sprite = PIXI.Sprite;
 let sound = PIXI.sound;
 let Texture = PIXI.Texture;
-let Text = PIXI.Text;
-let TextStyle = PIXI.TextStyle;
-let TilingSprite = PIXI.TilingSprite;
 
 // Constants
 const ANIM_SPEED = 0.07;
@@ -27,6 +24,24 @@ const ROAD = 12;
 const TREE = 13;
 
 // ####################################### CLASSES ############################
+
+class Pumpkin {
+    constructor() {
+        this.filled = 0;
+        this.sprite = new Sprite();
+        this.fillPumpkin();
+    }
+    
+    fillPumpkin() {
+        this.sprite.texture = Texture.from("pumpkin-" + this.filled + ".png");
+        this.filled++;
+    }
+    
+    resetPumpkin() {
+        this.filled = 0;
+        this.fillPumpkin();
+    }
+}
 
 class Tile {
     constructor(TYPE) {
@@ -170,7 +185,8 @@ class GameController {
         /*
          * Stage <- Backdrop (non scrolling)
          * Stage <- Background <- Scrolling Background
-         * Stage <- Foreground <- Ghost, UI
+         * Stage <- Foreground <- Ghost
+         * Stage <- UI <- Pumpkin
          * Stage <- MatchGameScene <- Matching Game (multiple)
          */
         this.background = new Container();
@@ -178,6 +194,9 @@ class GameController {
         
         this.foreground = new Container();
         this.stage.addChild(this.foreground);
+        
+        this.ui = new Container();
+        this.stage.addChild(this.ui);
         
         this.matchGameScene = new Container();
         this.stage.addChild(this.matchGameScene);
@@ -189,6 +208,8 @@ class GameController {
         this.ghost_walk_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-walk"];
         this.GHOST_X = this.width / 2;
         this.GHOST_Y = this.height / 2;
+        
+        this.pumpkin;
         
         this.tiles;
 
@@ -244,6 +265,7 @@ class GameController {
                 THIS.atHouse = false;
                 THIS.completed++;
                 THIS.checkGameEnd(THIS);
+                THIS.pumpkin.fillPumpkin();
             }
             // Do movement
             else if (THIS.canMove) {
@@ -320,6 +342,8 @@ class GameController {
         this.canMove = true;
         this.gameActive = true;
         this.completed = 0;
+        
+        this.pumpkin.resetPumpkin();
     }
 
     // Start a new game
@@ -347,6 +371,7 @@ class GameController {
     setup() {
         this.setupScrollingBG();
         this.setupGhost();
+        this.setupPumpkin();
     }
     
     // Add the player character (a ghost)
@@ -364,6 +389,12 @@ class GameController {
         this.ghost_walking.position = ({x: this.GHOST_X, y: this.GHOST_Y});
         this.foreground.addChild(this.ghost_walking);
         //this.ghost_walking.visible = false;
+    }
+    
+    setupPumpkin() {
+        this.pumpkin = new Pumpkin();
+        this.pumpkin.sprite.position = ({x: this.width - 100, y: this.height - 100});
+        this.ui.addChild(this.pumpkin.sprite);
     }
     
     // Add a scrolling background
