@@ -49,17 +49,29 @@ class Tile {
                 this.sprite.texture = Texture.from("grass_tile.png");
                 break;
             case HOUSE:
-                this.sprite.texture = Texture.from("pg_house_tile.png");
+                let house_tex = Texture.from("ro_house_tile.png");
+                if (this.flipACoin() === 1) {
+                    house_tex = Texture.from("pg_house_tile.png");
+                }
+                this.sprite.texture = house_tex;
                 this.light_on = true;
                 this.light.texture = Texture.from("light.png");
                 break;
             case TREE:
-                this.sprite.texture = Texture.from("tree_1_tile.png");
+                let tree_tex = Texture.from("tree_2_tile.png");
+                if (this.flipACoin() === 1) {
+                    tree_tex = Texture.from("tree_1_tile.png");
+                }
+                this.sprite.texture = tree_tex;
                 break;
             case ROAD:
                 this.sprite.texture = Texture.from("road_tile.png");
                 break;
         }
+    }
+    
+    flipACoin() {
+        return Math.round(Math.random());
     }
     
     getTileType() {
@@ -186,6 +198,13 @@ class GameController {
         // Setup the stage with the assets
         this.setup();
     }
+
+    // Add a mouse listener to the game
+    addMouseListener() {
+        this.functionOnClick = this.mousedownEventHandler(this);
+        let target = document.getElementById("gameport");
+        target.addEventListener("mousedown", this.functionOnClick);
+    }
     
     checkForHouse() {
         let index = this.tiles.getIndexAtLocation(this.ghost_walking.position.x, this.ghost_walking.position.y)
@@ -206,6 +225,9 @@ class GameController {
     // Used to check if the game has ended
     checkGameEnd(THIS) {
         THIS.gameActive = !(THIS.completed === THIS.goal);
+        if (!THIS.gameActive) {
+            THIS.removeMouseListener();
+        }
     }
 
     // Method to return if game is active
@@ -270,6 +292,13 @@ class GameController {
     
     // Handles "movement" of the player
     moveGhost(NEW_X, NEW_Y) {
+        if (NEW_X < this.ghost_walking.position.x) {
+            this.ghost_walking.scale.x = -1;
+        }
+        else if (NEW_X > this.ghost_walking.position.x) {
+            this.ghost_walking.scale.x = 1;
+        }
+        
         createjs.Tween.get(this.ghost_walking.position).to({x: NEW_X, y: NEW_Y}, TWEEN_SPEED).call(onComplete, [this]);
         function onComplete(THIS) {
             THIS.checkForHouse();
@@ -296,25 +325,22 @@ class GameController {
     // Start a new game
     runGame() {
         this.resetGame();
-        this.setMouseListener();
+        this.addMouseListener();
     }
     
     // Start a new matching game mini game
     runMatchingGame(THIS) {
+        //THIS.removeMouseListener();
+        
         let matchGame = new matchingGame(THIS.matchGameScene);
         console.log(matchGame.startGame());
         
         let index = THIS.tiles.getIndexAtLocation(THIS.ghost_walking.x, THIS.ghost_walking.y);
         THIS.tiles.getTileAtLocation(index).turnOffLight();
         
+        //THIS.addMouseListener();
+        
         THIS.checkForHouse();
-    }
-    
-    // Add a mouse listener to the game
-    setMouseListener() {
-        this.functionOnClick = this.mousedownEventHandler(this);
-        let target = document.getElementById("gameport");
-        target.addEventListener("mousedown", this.functionOnClick);
     }
     
     // Various tasks for setting up the game
