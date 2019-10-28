@@ -406,7 +406,6 @@ class GameController {
 
     // Resume the game when the menu goes away
     resumeGame() {
-        this.gameActive = true;
         this.addMouseListener();
         sound.play("background", {loop:true});
     }
@@ -491,7 +490,6 @@ class GameController {
     
     // Stop the game when a menu is displayed
     stopGame() {
-        this.gameActive = false;
         this.removeMouseListener();
         sound.stop("background");
     }
