@@ -261,10 +261,10 @@ function dispGameOver()
 function resetGame()
 {
   PIXI.sound.play("selectNoise");
-  gameScene.removeChildren();
-  newgame = new GameController(gameScene, 800, 500);
-  //newgame.runGame();
-  gameSetup();
+  //gameScene.removeChildren();
+  //newgame = new GameController(gameScene, 800, 500);
+  newgame.runGame();
+  //gameSetup();
   dispGame();
 }
 
