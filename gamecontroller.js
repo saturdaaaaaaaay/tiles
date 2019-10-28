@@ -241,6 +241,7 @@ class GameController {
         // Load sounds
         sound.add("footsteps", "audio/footsteps.mp3");
         sound.add("background", "audio/background.mp3");
+        sound.add("trickortreat", "audio/trickortreat.mp3");
         
         // Player character as a ghost
         this.ghost;             // Not currently used
@@ -403,6 +404,7 @@ class GameController {
         this.pumpkin.resetPumpkin();
     }
 
+    // Resume the game when the menu goes away
     resumeGame() {
         this.gameActive = true;
         this.addMouseListener();
@@ -420,6 +422,8 @@ class GameController {
     runMatchingGame(THIS) {
         // Pause mouse listener
         //THIS.removeMouseListener();
+        
+        sound.play("trickortreat");
         
         //let matchGame = new matchingGame(THIS.matchGameScene);
         //console.log(matchGame.startGame());
@@ -485,6 +489,7 @@ class GameController {
         this.background.position.y = this.height / 2 - this.background.height / 2;
     }
     
+    // Stop the game when a menu is displayed
     stopGame() {
         this.gameActive = false;
         this.removeMouseListener();
