@@ -1,7 +1,15 @@
 // gamecontroller.js
 
 /*
+ * Use of tiles: in classes Tile and Tiles, and in
+ *  GameController.setupScrollingBG()
  * 
+ * Use of spritesheets: loaded in game.js, used here
+ * 
+ * Use of scene graphs and classes: scene graphs are mostly in class
+ *  GameController, 4 classes are used in this file
+ * 
+ * Use of git at: https://github.com/saturdaaaaaaaay/tiles
  */
 
 // Alias Declarations
@@ -11,23 +19,49 @@ let Loader = PIXI.Loader;
 let Sprite = PIXI.Sprite;
 let sound = PIXI.sound;
 let Texture = PIXI.Texture;
-let Text = PIXI.Text;
-let TextStyle = PIXI.TextStyle;
-let TilingSprite = PIXI.TilingSprite;
 
-// Constants
-const ANIM_SPEED = 0.07;
-const PADDING = 150;
-const TWEEN_SPEED = 1000;
+// Global Constants
+const ANIM_SPEED = 0.07;    // ghost animation
+const PADDING = 150;        // stage padding around border
+const TWEEN_SPEED = 1000;   // movement tween animation
 
-const TILE_SIZE = 300;
-const GRASS = 10;
-const HOUSE = 11;
-const ROAD = 12;
-const TREE = 13;
+const TILE_SIZE = 300;      // tiles are square
+const GRASS = 10;           // grass tile
+const HOUSE = 11;           // house tile
+const ROAD = 12;            // road tile
+const TREE = 13;            // tree tile
 
 // ####################################### CLASSES ############################
 
+/*
+ * Used to gauge amount of candy collected. Goes from 0% -> 25% -> 50% -> 75%
+ */
+class Pumpkin {
+    constructor() {
+        this.filled = 0;
+        this.sprite = new Sprite();
+        this.fillPumpkin();
+    }
+    
+    // Add candy to the pumpkin
+    fillPumpkin() {
+        this.sprite.texture = Texture.from("pumpkin-" + this.filled + ".png");
+        this.filled++;
+    }
+    
+    resetPumpkin() {
+        this.filled = 0;
+        this.fillPumpkin();
+    }
+}
+
+/*
+ * Keeps track of different data for one tile. A tile can be grass, house,
+ *  tree, or road.
+ * 
+ * If the tile is a house, it shows a porch light to represent a house that
+ *  hasn't been visited yet.
+ */
 class Tile {
     constructor(TYPE) {
         this.description = TYPE;
@@ -43,18 +77,27 @@ class Tile {
         this.createSprite();
     }
     
+    // Gives the appropriate texture for the sprite
     createSprite() {
         switch(this.description) {
             case GRASS:
                 this.sprite.texture = Texture.from("grass_tile.png");
                 break;
             case HOUSE:
-                this.sprite.texture = Texture.from("pg_house_tile.png");
+                let house_tex = Texture.from("ro_house_tile.png");
+                if (this.flipACoin() === 1) {
+                    house_tex = Texture.from("pg_house_tile.png");
+                }
+                this.sprite.texture = house_tex;
                 this.light_on = true;
                 this.light.texture = Texture.from("light.png");
                 break;
             case TREE:
-                this.sprite.texture = Texture.from("tree_1_tile.png");
+                let tree_tex = Texture.from("tree_2_tile.png");
+                if (this.flipACoin() === 1) {
+                    tree_tex = Texture.from("tree_1_tile.png");
+                }
+                this.sprite.texture = tree_tex;
                 break;
             case ROAD:
                 this.sprite.texture = Texture.from("road_tile.png");
@@ -62,6 +105,12 @@ class Tile {
         }
     }
     
+    // Used to determine if alternate texture is used
+    flipACoin() {
+        return Math.round(Math.random());
+    }
+    
+    // Retuns GRASS, HOUSE, TREE, or ROAD
     getTileType() {
         return this.description;
     }
@@ -76,6 +125,10 @@ class Tile {
     }
 }
 
+/*
+ * Keeps track of the data structure for the tiles. Holds instances of class
+ *  Tile in an array.
+ */
 class Tiles {
     constructor(WIDTH, HEIGHT, STAGE, TILE_DATA) {
         this.stage = STAGE;
@@ -103,6 +156,7 @@ class Tiles {
         }
     }
     
+    // Return the index of the tile that the ghost is standing on
     getIndexAtLocation(X, Y) {
         let abs_x = X - this.stage.position.x;
         let abs_y = Y - this.stage.position.y;
@@ -118,6 +172,7 @@ class Tiles {
         return this.getTileAtLocation(INDEX).getTileType();
     }
     
+    // Allows for tile data to be imported
     populateTiles(TILE_DATA) {
         let index;
         for (index = 0; index < this.tiles_count; index++) {
@@ -126,8 +181,12 @@ class Tiles {
     }
 }
 
+/*
+ * Main class for the trick or treat part of the game. To use, make an
+ *  instance and call runGame(). This class will automatically reset the
+ *  game state every time runGame() is called.
+ */
 class GameController {
-    
     /*
      * Initialize a game that takes place on STAGE with dimensions WIDTH X
      *  HEIGHT
@@ -141,25 +200,31 @@ class GameController {
         this.width = WIDTH;
         this.height = HEIGHT;
 
+        // Don't let the player reach the edges
         this.BOUND_LEFT = PADDING;
         this.BOUND_RIGHT = this.width - PADDING;
         this.BOUND_TOP = PADDING;
         this.BOUND_BOTTOM = this.height - PADDING;
         
+        // Is the player currently at a house
         this.atHouse = false;
+        // Can the player move?
         this.canMove = true;
+        // Is the game in the active state?
         this.gameActive = true;
         
         // Houses completed vs goal
         this.completed = 0;
         this.goal = 4;
 
-        // Scene Graph
+        // A Scene Graph
         /*
-         * Stage <- Backdrop (non scrolling)
-         * Stage <- Background <- Scrolling Background
-         * Stage <- Foreground <- Ghost, UI
-         * Stage <- MatchGameScene <- Matching Game (multiple)
+         * A container in game.js <- Stage
+         * 
+         * Stage <- Background <- Scrolling Background (tiles)
+         * Stage <- Foreground <- Ghost
+         * Stage <- UI <- Pumpkin
+         * Stage <- MatchGameScene <- Matching Game instances
          */
         this.background = new Container();
         this.stage.addChild(this.background);
@@ -167,17 +232,24 @@ class GameController {
         this.foreground = new Container();
         this.stage.addChild(this.foreground);
         
+        this.ui = new Container();
+        this.stage.addChild(this.ui);
+        
         this.matchGameScene = new Container();
         this.stage.addChild(this.matchGameScene);
         
-        // Player character
-        this.ghost;
+        // Player character as a ghost
+        this.ghost;             // Not currently used
         this.ghost_walking;
-        this.ghost_stand_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-stand"];
+        this.ghost_stand_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-stand"];    // Not used
         this.ghost_walk_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-walk"];
         this.GHOST_X = this.width / 2;
         this.GHOST_Y = this.height / 2;
         
+        // Pumpkin gauge for candy amount
+        this.pumpkin;
+        
+        // Class reference to the tiling
         this.tiles;
 
         // Class property to represent the function so that it can be removed
@@ -186,16 +258,27 @@ class GameController {
         // Setup the stage with the assets
         this.setup();
     }
+
+    // Add a mouse listener to the game
+    addMouseListener() {
+        this.functionOnClick = this.mousedownEventHandler(this);
+        let target = document.getElementById("gameport");
+        target.addEventListener("mousedown", this.functionOnClick);
+    }
     
+    // Find out if the player is standing on a house tile
     checkForHouse() {
         let index = this.tiles.getIndexAtLocation(this.ghost_walking.position.x, this.ghost_walking.position.y)
         let tile_type = this.tiles.getTileTypeAtLocation(index);
         let houseActive = this.tiles.getTileAtLocation(index).isLightOn();
+        
+        // On a house tile
         if (tile_type === HOUSE && houseActive) {
             this.ghost_walking.stop();
             this.ghost_walking.texture = Texture.from("ghost-pumpkin.png");
             this.atHouse = true;
         }
+        // Not a house tile
         else {
             this.ghost_walking.textures = this.ghost_walk_anim;
             this.ghost_walking.play();
@@ -206,6 +289,9 @@ class GameController {
     // Used to check if the game has ended
     checkGameEnd(THIS) {
         THIS.gameActive = !(THIS.completed === THIS.goal);
+        if (!THIS.gameActive) {
+            THIS.removeMouseListener();
+        }
     }
 
     // Method to return if game is active
@@ -216,14 +302,17 @@ class GameController {
     // Handles all the mouse clicking in-game
     mousedownEventHandler(THIS) {
         return function (event) {
-            // Check if activating house
+            
+            // Check if activating a house
             if (THIS.atHouse) {
                 THIS.runMatchingGame(THIS);
                 THIS.atHouse = false;
                 THIS.completed++;
                 THIS.checkGameEnd(THIS);
+                THIS.pumpkin.fillPumpkin();
             }
-            // Do movement
+            
+            // Do movement instead
             else if (THIS.canMove) {
                 THIS.togglePause();
                 let move_x = event.offsetX;
@@ -231,6 +320,8 @@ class GameController {
                 let remainder_x = 0;
                 let remainder_y = 0;
 
+                // Player can only reach the boundaries. After that, move
+                // the background the rest of the way
                 if (move_x < THIS.BOUND_LEFT) {
                     remainder_x = THIS.BOUND_LEFT - move_x;
                     if (THIS.background.position.x + remainder_x > 0) {
@@ -264,19 +355,31 @@ class GameController {
         }
     }
     
+    // Handles movement of the background
     moveBG(OFFSET_X, OFFSET_Y) {
         createjs.Tween.get(this.background.position).to({x: this.background.position.x + OFFSET_X, y: this.background.position.y + OFFSET_Y}, TWEEN_SPEED);
     }
     
-    // Handles "movement" of the player
+    // Handles movement of the player
     moveGhost(NEW_X, NEW_Y) {
+        // Make sure the player sprite is facing an appropriate direction
+        if (NEW_X < this.ghost_walking.position.x) {
+            this.ghost_walking.scale.x = -1;
+        }
+        else if (NEW_X > this.ghost_walking.position.x) {
+            this.ghost_walking.scale.x = 1;
+        }
+        
+        // Movement
         createjs.Tween.get(this.ghost_walking.position).to({x: NEW_X, y: NEW_Y}, TWEEN_SPEED).call(onComplete, [this]);
+        // To be completed after the tween is finished
         function onComplete(THIS) {
             THIS.checkForHouse();
             THIS.togglePause();
         }
     }
     
+    // Remove the mouse listener
     removeMouseListener() {
         let target = document.getElementById("gameport");
         target.removeEventListener("mousedown", this.functionOnClick);
@@ -291,46 +394,52 @@ class GameController {
         this.canMove = true;
         this.gameActive = true;
         this.completed = 0;
+        
+        this.pumpkin.resetPumpkin();
     }
 
     // Start a new game
     runGame() {
         this.resetGame();
-        this.setMouseListener();
+        this.addMouseListener();
     }
     
     // Start a new matching game mini game
     runMatchingGame(THIS) {
+        // Pause mouse listener
+        //THIS.removeMouseListener();
+        
         let matchGame = new matchingGame(THIS.matchGameScene);
         console.log(matchGame.startGame());
         
+        // Deactivate house
         let index = THIS.tiles.getIndexAtLocation(THIS.ghost_walking.x, THIS.ghost_walking.y);
         THIS.tiles.getTileAtLocation(index).turnOffLight();
         
+        // Resume mouse listener
+        //THIS.addMouseListener();
+        
+        // Update the house state
         THIS.checkForHouse();
     }
     
-    // Add a mouse listener to the game
-    setMouseListener() {
-        this.functionOnClick = this.mousedownEventHandler(this);
-        let target = document.getElementById("gameport");
-        target.addEventListener("mousedown", this.functionOnClick);
-    }
-    
-    // Various tasks for setting up the game
+    // Various tasks for setting up the game the first time
     setup() {
         this.setupScrollingBG();
         this.setupGhost();
+        this.setupPumpkin();
     }
     
     // Add the player character (a ghost)
     setupGhost() {
+        // ghost is not working so it isn't used
         this.ghost = new AnimatedSprite(this.ghost_stand_anim);
         this.ghost.animationSpeed = ANIM_SPEED;
         this.ghost.play();
         this.ghost.position = ({x: this.GHOST_X, y: this.GHOST_Y});
         //this.foreground.addChild(this.ghost);
         
+        // ghost walking is used as the main sprite
         this.ghost_walking = new AnimatedSprite(this.ghost_walk_anim);
         this.ghost_walking.animationSpeed = ANIM_SPEED;
         this.ghost_walking.play();
@@ -340,8 +449,16 @@ class GameController {
         //this.ghost_walking.visible = false;
     }
     
+    // Add the pumpkin candy gauge to the game
+    setupPumpkin() {
+        this.pumpkin = new Pumpkin();
+        this.pumpkin.sprite.position = ({x: this.width - 100, y: this.height - 100});
+        this.ui.addChild(this.pumpkin.sprite);
+    }
+    
     // Add a scrolling background
-    setupScrollingBG() {        
+    setupScrollingBG() {
+        // This tile data could be imported from a file
         this.tile_data = [
             GRASS, GRASS, GRASS, GRASS, GRASS,
             TREE, HOUSE, TREE, HOUSE, TREE,
@@ -349,18 +466,20 @@ class GameController {
             TREE, HOUSE, TREE, HOUSE, TREE,
             GRASS, GRASS, GRASS, GRASS, GRASS
         ];
-        
         this.tiles = new Tiles(5, 5, this.background, this.tile_data);
         
+        // Place the ghost at the center of the tiles
         this.background.position.x = this.width / 2 - this.background.width / 2;
         this.background.position.y = this.height / 2 - this.background.height / 2;
     }
     
+    // Not working. Supposed to switch between stationary and moving animations
     toggleGhostAnim() {
         this.ghost.visible = !this.ghost.visble;
         this.ghost_walking.visible = !this.ghost_walking.visible;
     }
 
+    // Toggle if the player can move or not
     togglePause() {
         this.canMove = !this.canMove;
     }
