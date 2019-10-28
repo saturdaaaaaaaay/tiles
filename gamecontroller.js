@@ -23,7 +23,7 @@ let Texture = PIXI.Texture;
 // Global Constants
 const ANIM_SPEED = 0.07;    // ghost animation
 const PADDING = 150;        // stage padding around border
-const TWEEN_SPEED = 1000;   // movement tween animation
+const TWEEN_SPEED = 1500;   // movement tween animation
 
 const TILE_SIZE = 300;      // tiles are square
 const GRASS = 10;           // grass tile
@@ -238,6 +238,10 @@ class GameController {
         this.matchGameScene = new Container();
         this.stage.addChild(this.matchGameScene);
         
+        // Load sounds
+        sound.add("footsteps", "audio/footsteps.mp3");
+        sound.add("background", "audio/background.mp3");
+        
         // Player character as a ghost
         this.ghost;             // Not currently used
         this.ghost_walking;
@@ -290,7 +294,7 @@ class GameController {
     checkGameEnd(THIS) {
         THIS.gameActive = !(THIS.completed === THIS.goal);
         if (!THIS.gameActive) {
-            THIS.removeMouseListener();
+            THIS.stopGame();
         }
     }
 
@@ -371,6 +375,7 @@ class GameController {
         }
         
         // Movement
+        sound.play("footsteps");
         createjs.Tween.get(this.ghost_walking.position).to({x: NEW_X, y: NEW_Y}, TWEEN_SPEED).call(onComplete, [this]);
         // To be completed after the tween is finished
         function onComplete(THIS) {
@@ -398,10 +403,17 @@ class GameController {
         this.pumpkin.resetPumpkin();
     }
 
+    resumeGame() {
+        this.gameActive = true;
+        this.addMouseListener();
+        sound.play("background", {loop:true});
+    }
+
     // Start a new game
     runGame() {
         this.resetGame();
         this.addMouseListener();
+        sound.play("background", {loop: true});
     }
     
     // Start a new matching game mini game
@@ -409,8 +421,8 @@ class GameController {
         // Pause mouse listener
         //THIS.removeMouseListener();
         
-        let matchGame = new matchingGame(THIS.matchGameScene);
-        console.log(matchGame.startGame());
+        //let matchGame = new matchingGame(THIS.matchGameScene);
+        //console.log(matchGame.startGame());
         
         // Deactivate house
         let index = THIS.tiles.getIndexAtLocation(THIS.ghost_walking.x, THIS.ghost_walking.y);
@@ -471,6 +483,12 @@ class GameController {
         // Place the ghost at the center of the tiles
         this.background.position.x = this.width / 2 - this.background.width / 2;
         this.background.position.y = this.height / 2 - this.background.height / 2;
+    }
+    
+    stopGame() {
+        this.gameActive = false;
+        this.removeMouseListener();
+        sound.stop("background");
     }
     
     // Not working. Supposed to switch between stationary and moving animations

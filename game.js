@@ -38,6 +38,7 @@ PIXI.sound.add("selectNoise", "select.mp3");
 
 PIXI.Loader.shared
     .add("ghost.json")
+    .add("pumpkin.json")
     .add("tileset.json")
     .add("buttons.json")
     .load(setup);
@@ -117,7 +118,7 @@ function titleSetup()
 
 function gameSetup()
 {
-  newgame.runGame();
+  //newgame.runGame();
   //menuText =  new PIXI.Text("Menu", {fill : 0x000000});
   menuText = new PIXI.Sprite(PIXI.Texture.fromFrame("menu.png"));
 
@@ -226,16 +227,6 @@ function dispTitle()
 
   PIXI.sound.play("selectNoise");
   gameScene.removeChildren();
-  newgame = new GameController(gameScene, 800, 500);
-  //newgame.runGame();
-  //
-
-  /*
-  var ghost_walk_anim = Loader.shared.resources["ghost.json"].spritesheet.animations["ghost-walk"];
-  var ghost_walking = new AnimatedSprite(this.ghost_walk_anim);
-  */
-
-  titleScene.addChild(ghost_walking);
 
   gameSetup();
 }
@@ -279,6 +270,7 @@ function dispMenu()
 {
   PIXI.sound.play("selectNoise");
   gameScene.visible = false;
+  newgame.stopGame();
   menuScene.visible = true;
 }
 
@@ -292,7 +284,6 @@ function resetGame()
 {
   PIXI.sound.play("selectNoise");
   //gameScene.removeChildren();
-  //newgame = new GameController(gameScene, 800, 500);
   newgame.runGame();
   //gameSetup();
   dispGame();
