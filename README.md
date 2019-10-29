@@ -10,4 +10,4 @@
 * Rebecca Leggett (ral349@nau.edu)
 
 #### Link to Game:
-(link)
+https://dana.ucc.nau.edu/ecc226/cs413/project_3/
