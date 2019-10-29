@@ -1,7 +1,6 @@
 //set up gameport, renderer, and stage
 var gameport = document.getElementById("gameport");
 var app = new PIXI.Application({width: 800, height: 500, backgroundColor: 0xffffff});
-app.backgroundColor = "0xffffff";
 gameport.appendChild(app.view);
 
 //scene graphs
@@ -39,7 +38,7 @@ var gameOverText;
 var ghost_walk_anim;
 var ghost_walking;
 
-var fillerText = new PIXI.Text("Filler", {fill : 0xff1010});
+//var fillerText = new PIXI.Text("Filler", {fill : 0xff1010});
 
 //menu select sound effect
 PIXI.sound.add("selectNoise", "select.mp3");
@@ -100,7 +99,7 @@ function titleSetup()
   ghost_walking.play();
 
   //create buttons/title from spritesheets
-  titleText = new PIXI.Text("Untitled Trick or Treat Game", {fill : 0xff1010});
+  titleText = new PIXI.Sprite(PIXI.Texture.from("title.png"));
   startText = new PIXI.Sprite(PIXI.Texture.from("play.png"));
   howToPlayText = new PIXI.Sprite(PIXI.Texture.from("howtoplay.png"));
   creditText = new PIXI.Sprite(PIXI.Texture.from("credits.png"));
@@ -113,14 +112,14 @@ function titleSetup()
   titleScene.addChild(ghost_walking);
 
   //position buttons/title
-  titleText.position.x = 200;
+  titleText.position.x = 75;
   titleText.position.y = 100;
   startText.position.x = 300;
-  startText.position.y = 150;
+  startText.position.y = 215;
   howToPlayText.position.x = 275;
-  howToPlayText.position.y = 225;
+  howToPlayText.position.y = 275;
   creditText.position.x = 275;
-  creditText.position.y = 300;
+  creditText.position.y = 350;
   ghost_walking.position.x = 300;
 
   //turn button sprites into buttons
@@ -213,7 +212,7 @@ function menuSetup()
 function howToPlaySetup()
 {
   //create instructions and buttons from spritesheet
-  howToPlay = new PIXI.Sprite();
+  howToPlay = new PIXI.Sprite(PIXI.Texture.from("howtoplayscene.png"));
   titleReturnText = new PIXI.Sprite(PIXI.Texture.from("return.png"));
   exitText = new PIXI.Sprite(PIXI.Texture.from("cancel.png"));
 
@@ -223,6 +222,8 @@ function howToPlaySetup()
   howToPlayScene.addChild(exitText);
 
   //position sprites
+  howToPlay.position.x = 200;
+  howToPlay.position.y = 50;
   titleReturnText.position.x = 100;
   titleReturnText.position.y = 400;
   exitText.position.x = 400;
@@ -242,12 +243,16 @@ function howToPlaySetup()
 function creditSetup()
 {
   //create credits and return button sprite from spritesheet
-  credits = new PIXI.Sprite();
+  credits = new PIXI.Sprite(PIXI.Texture.from("creditScene.png"));
   titleReturnText = new PIXI.Sprite(PIXI.Texture.from("return.png"));
 
   //add button sprite to creditScene
   creditScene.addChild(titleReturnText);
   creditScene.addChild(credits);
+
+  //position credits sprite
+  credits.position.x = 200;
+  credits.position.y = 50;
 
   //position button sprite and turn into button
   titleReturnText.position.x = 200;
@@ -262,12 +267,16 @@ function creditSetup()
 function gameOverSetup()
 {
   //create game over text and return button from spritesheet
-  gameOverText = new PIXI.Text("Game Over", {fill : 0xff1010});
+  gameOverText = new PIXI.Sprite(PIXI.Texture.from("gameover.png"));
   titleReturnText = new PIXI.Sprite(PIXI.Texture.from("return.png"));
 
   //add game over text and return button to gameOverScene
   gameOverScene.addChild(gameOverText);
   gameOverScene.addChild(titleReturnText);
+
+  //position game over sprite
+  gameOverText.position.x = 150;
+  gameOverText.position.y = 50;
 
   //position button sprite and turn into button
   titleReturnText.position.x = 200;

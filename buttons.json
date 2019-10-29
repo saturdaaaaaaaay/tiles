@@ -2,7 +2,7 @@
 
 "cancel.png":
 {
-	"frame": {"x":0,"y":0,"w":125,"h":50},
+	"frame": {"x":753,"y":0,"w":125,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":125,"h":50},
@@ -10,23 +10,47 @@
 },
 "credits.png":
 {
-	"frame": {"x":125,"y":0,"w":159,"h":50},
+	"frame": {"x":878,"y":0,"w":159,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":159,"h":50},
 	"sourceSize": {"w":159,"h":50}
 },
+"creditScene.png":
+{
+	"frame": {"x":518,"y":100,"w":481,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":481,"h":300},
+	"sourceSize": {"w":481,"h":300}
+},
+"gameover.png":
+{
+	"frame": {"x":0,"y":100,"w":518,"h":200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":518,"h":200},
+	"sourceSize": {"w":518,"h":200}
+},
 "howtoplay.png":
 {
-	"frame": {"x":284,"y":0,"w":164,"h":50},
+	"frame": {"x":80,"y":0,"w":164,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":164,"h":50},
 	"sourceSize": {"w":164,"h":50}
 },
+"howtoplayscene.png":
+{
+	"frame": {"x":999,"y":100,"w":378,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":378,"h":300},
+	"sourceSize": {"w":378,"h":300}
+},
 "menu.png":
 {
-	"frame": {"x":448,"y":0,"w":85,"h":50},
+	"frame": {"x":244,"y":0,"w":85,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":85,"h":50},
@@ -34,7 +58,7 @@
 },
 "play.png":
 {
-	"frame": {"x":533,"y":0,"w":80,"h":50},
+	"frame": {"x":0,"y":0,"w":80,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":50},
@@ -42,7 +66,7 @@
 },
 "return.png":
 {
-	"frame": {"x":613,"y":0,"w":264,"h":50},
+	"frame": {"x":329,"y":0,"w":264,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":264,"h":50},
@@ -50,19 +74,27 @@
 },
 "startover.png":
 {
-	"frame": {"x":877,"y":0,"w":160,"h":50},
+	"frame": {"x":593,"y":0,"w":160,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":50},
 	"sourceSize": {"w":160,"h":50}
+},
+"title.png":
+{
+	"frame": {"x":1037,"y":0,"w":578,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":578,"h":100},
+	"sourceSize": {"w":578,"h":100}
 }},
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
 	"image": "buttons.png",
 	"format": "RGBA8888",
-	"size": {"w":1037,"h":50},
+	"size": {"w":1615,"h":400},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:2af02df6734536724947ce00fa3c5147:7e001f8de3dead0c55b41ff41a5169ad:b34c8670b11bb20cb1751a70d3683e22$"
+	"smartupdate": "$TexturePacker:SmartUpdate:8856b70d524b4e01836c633c8113633f:5896cbb11a56b84a45f1a9c4bd0f2b6b:b34c8670b11bb20cb1751a70d3683e22$"
 }
 }
